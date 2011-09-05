@@ -1,0 +1,46 @@
+<script src="NumJS.GenOps.js"></script>
+<script src="NumJS.Cmplx.js"></script>
+<script src="NumJS.Matrix.js"></script>
+<pre><script>
+
+var M = new NumJS.RMatrix(4, 4, [
+	1, 2, 3, 4,
+	5, 6, 7, 8,
+	9, 0, 1, 2,
+	3, 4, 5, 6
+]);
+
+var v = new NumJS.RMatrix(4, 1, [ 10, 20, 30, 40 ]);
+
+document.write("M = " + M + "\n");
+document.write("v = " + v + "\n");
+document.write("M*v == " + NumJS.MUL(M, v) + "\n\n");
+
+var P = new NumJS.PMatrix(4);
+
+P.pivot_col(0, 1);
+P.pivot_col(1, 2);
+P.pivot_col(2, 3);
+
+document.write("P = " + P + "\n");
+document.write("P*v == " + NumJS.MUL(P, v) + "\n\n");
+
+var Pinv = NumJS.INV(P);
+var w = NumJS.MUL(P, v);
+
+document.write("P' == " + Pinv + "\n");
+document.write("P'*(P*v) == " + NumJS.MUL(Pinv, w) + "\n\n");
+document.write("(P')*P == " + NumJS.MUL(Pinv, P) + "\n\n");
+
+var P1 = new NumJS.PMatrix(4);
+var P2 = new NumJS.PMatrix(4);
+
+P1.pivot_col(0, 1);
+P2.pivot_col(1, 2);
+P2.pivot_col(2, 3);
+
+document.write("P1 = " + P1 + "\n");
+document.write("P2 = " + P2 + "\n");
+document.write("P1*P2 == " + NumJS.MUL(P1, P2) + "\n");
+
+</script></pre>

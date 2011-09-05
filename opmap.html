@@ -1,0 +1,75 @@
+<script src="NumJS.GenOps.js"></script>
+<script src="NumJS.Cmplx.js"></script>
+<script src="NumJS.Matrix.js"></script>
+<script>
+
+var binOps = [ "ADD", "SUB", "MUL", "DOT", "DIV" ];
+var uniOps = [ "INV", "ABS", "NORM", "ARG", "CONJ", "TRANSP", "POW", "EXP", "LOG", "RE", "IM" ];
+
+var exampleFloat = 1;
+var exampleCmplx = NumJS.C(1, 1);
+var exampleRMatrix = new NumJS.RMatrix(1, 1, [ exampleFloat ]);
+var exampleCMatrix = new NumJS.CMatrix(1, 1, [ exampleCmplx ]);
+var examplePMatrix = new NumJS.PMatrix(1);
+
+var operandNames = [ "Real", "Cmplx", "RMatrix", "CMatrix", "PMatrix" ];
+var operandExamples = [ exampleFloat, exampleCmplx, exampleRMatrix, exampleCMatrix, examplePMatrix ];
+
+for (i in binOps)
+{
+	document.write("<p>Implentation chart for binary operator " + binOps[i] + ":\n<table border width=\"100%\">\n");
+
+	document.write("<tr><td>&nbsp;</td>\n");
+	for (j in operandNames)
+		document.write("<th>" + operandNames[j] + "</th>");
+	document.write("</tr>\n");
+
+	for (j in operandNames) {
+		document.write("<tr><th>" + operandNames[j] + "</th>");
+		for (k in operandNames) {
+			var isOk = 1;
+			try {
+				NumJS[binOps[i]](operandExamples[j], operandExamples[k]);
+			} catch (e) {
+				isOk = 0;
+			}
+			if (isOk) {
+				document.write("<td style=\"background-color: #0f0;\">OK</td>");
+			} else {
+				document.write("<td style=\"background-color: #f00;\">X</td>");
+			}
+		}
+		document.write("</tr>\n");
+	}
+
+	document.write("</table></p>\n");
+}
+
+document.write("<p>Implentation chart for unary operators:\n<table border width=\"100%\">\n");
+
+document.write("<tr><td>&nbsp;</td>\n");
+for (j in operandNames)
+	document.write("<th>" + operandNames[j] + "</th>");
+document.write("</tr>\n");
+
+for (i in uniOps) {
+	document.write("<tr><th>" + uniOps[i] + "</th>");
+	for (k in operandNames) {
+		var isOk = 1;
+		try {
+			NumJS[uniOps[i]](operandExamples[k]);
+		} catch (e) {
+			isOk = 0;
+		}
+		if (isOk) {
+			document.write("<td style=\"background-color: #0f0;\">OK</td>");
+		} else {
+			document.write("<td style=\"background-color: #f00;\">X</td>");
+		}
+	}
+	document.write("</tr>\n");
+}
+
+document.write("</table></p>\n");
+
+</script>

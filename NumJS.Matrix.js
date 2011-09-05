@@ -1,0 +1,298 @@
+/*
+ *  NumJS -- a JavaScript library for numerical computing
+ *
+ *  Copyright (C) 2011  Clifford Wolf <clifford@clifford.at>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
+"use strict";
+
+if (typeof(NumJS) == "undefined")
+	var NumJS = new Object();
+
+// Generic Matrix -- do not instanciate directly!
+
+NumJS.GenericMatrix = function(rows, cols) {
+	this.rows = rows;
+	this.cols = cols;
+};
+
+NumJS.Matrix = function(rows, cols) {
+	this.rows = rows;
+	this.cols = cols;
+};
+
+NumJS.GenericMatrix.prototype =
+{
+	get: function(i, j) {
+		throw "NumJS.Matrix called virtual function from NumJS.GenericMatrix";
+	},
+	set: function(i, j, v) {
+		throw "NumJS.Matrix called virtual function from NumJS.GenericMatrix";
+	},
+	op_add: function(a, b) {
+		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
+		{
+			var result;
+			if (a.rows != b.rows || a.cols != b.cols)
+				throw "NumJS.Matrix dimension mismatch";
+			if ((a instanceof NumJS.CMatrix) || (b instanceof NumJS.CMatrix))
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < a.cols; j++)
+				result.set(i, j, NumJS.ADD(a.get(i, j), b.get(i, j)));
+			return result;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_add) == "function"))
+			return b.op_add(a, b);
+		throw "NumJS.Matrix type error";
+	},
+	op_sub: function(a, b) {
+		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
+		{
+			var result;
+			if (a.rows != b.rows || a.cols != b.cols)
+				throw "NumJS.Matrix dimension mismatch";
+			if ((a instanceof NumJS.CMatrix) || (b instanceof NumJS.CMatrix))
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < a.cols; j++)
+				result.set(i, j, NumJS.SUB(a.get(i, j), b.get(i, j)));
+			return result;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_sub) == "function"))
+			return b.op_sub(a, b);
+		throw "NumJS.Matrix type error";
+	},
+	op_mul: function(a, b) {
+		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
+		{
+			var result;
+			if (a.cols != b.rows)
+				throw "NumJS.Matrix dimension mismatch";
+			if ((a instanceof NumJS.CMatrix) || (b instanceof NumJS.CMatrix))
+				result = new NumJS.CMatrix(a.rows, b.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, b.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < b.cols; j++)
+			{
+				var v = result.get(i, j);
+				for (var k=0; k < a.cols; k++)
+					v = NumJS.ADD(v, NumJS.MUL(a.get(i, k), b.get(k, j)));
+				result.set(i, j, v);
+			}
+			return result;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_mul) == "function"))
+			return b.op_mul(a, b);
+		throw "NumJS.Matrix type error";
+	},
+	op_dot: function(a, b) {
+		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
+		{
+			var result = 0;
+			if (a.cols != b.cols || a.rows != b.rows)
+				throw "NumJS.Matrix dimension mismatch";
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < b.cols; j++)
+				result = NumJS.ADD(result, NumJS.MUL(a.get(i, j), b.get(i, j)));
+			return result;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_mul) == "function"))
+			return b.op_mul(a, b);
+		throw "NumJS.Matrix type error";
+	},
+	op_conj: function(a) {
+		if (a instanceof NumJS.GenericMatrix)
+		{
+			var result;
+			if (a instanceof NumJS.CMatrix)
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < b.cols; j++)
+				result.set(i, j, NumJS.CONJ(a.get(j, i)));
+			return result;
+		}
+		throw "NumJS.Matrix type error";
+	},
+	op_transp: function(a) {
+		if (a instanceof NumJS.GenericMatrix)
+		{
+			var result;
+			if (a instanceof NumJS.CMatrix)
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < b.cols; j++)
+				result.set(i, j, a.get(j, i));
+			return result;
+		}
+		throw "NumJS.Matrix type error";
+	},
+	toString: function() {
+		var str = "[ ";
+		for (var i=0; i < this.rows; i++)
+		{
+			for (var j=0; j < this.cols; j++)
+				str += (j > 0 ? ", " : "") + this.get(i, j);
+			if (i < this.rows-1)
+				str += "; "
+		}
+		str += " ]";
+		return str;
+	}
+};
+
+// Matrix of real values
+
+NumJS.RMatrix = function(rows, cols, initdata) {
+	this.rows = rows;
+	this.cols = cols;
+	if (typeof(Float32Array) != "undefined")
+		this.data = new Float32Array(this.rows * this.cols);
+	else
+		this.data = Array();
+	for (var i=0; i < this.rows; i++)
+	for (var j=0; j < this.cols; j++)
+		this.data[i*this.cols + j] = 0;
+	if (initdata instanceof Array) {
+		for (var i = 0; i < this.rows*this.cols && i < initdata.length; i++)
+			this.data[i] = initdata[i];
+	}
+};
+
+NumJS.RMatrix.prototype = new NumJS.GenericMatrix();
+
+NumJS.RMatrix.prototype.get = function(i, j) {
+	return this.data[i*this.cols + j];
+};
+
+NumJS.RMatrix.prototype.set = function(i, j, v) {
+	this.data[i*this.cols + j] = v;
+};
+
+// Matrix of complex values
+
+NumJS.CMatrix = function(rows, cols, initdata) {
+	this.rows = rows;
+	this.cols = cols;
+	if (typeof(Float32Array) != "undefined") {
+		this.re_data = new Float32Array(this.rows * this.cols);
+		this.im_data = new Float32Array(this.rows * this.cols);
+	} else {
+		this.re_data = Array();
+		this.im_data = Array();
+	}
+	for (var i=0; i < this.rows; i++)
+	for (var j=0; j < this.cols; j++) {
+		this.re_data[i*this.cols + j] = 0;
+		this.im_data[i*this.cols + j] = 0;
+	}
+	if (initdata instanceof Array) {
+		for (var i = 0; i < this.rows*this.cols && i < initdata.length; i++) {
+			this.re_data[i] = NumJS.RE(initdata[i]);
+			this.im_data[i] = NumJS.IM(initdata[i]);
+		}
+	}
+};
+
+NumJS.CMatrix.prototype = new NumJS.GenericMatrix();
+
+NumJS.CMatrix.prototype.get = function(i, j) {
+	return NumJS.C(this.re_data[i*this.cols + j], this.im_data[i*this.cols + j]);
+};
+
+NumJS.CMatrix.prototype.set = function(i, j, v) {
+	this.re_data[i*this.cols + j] = NumJS.RE(v);
+	this.im_data[i*this.cols + j] = NumJS.IM(v);
+};
+
+// Permutation Matrix
+
+NumJS.PMatrix = function(dim, initdata) {
+	this.rows = dim;
+	this.cols = dim;
+	this.data = Array();
+	for (var i=0; i < dim; i++)
+		this.data[i] = i;
+	if (initdata instanceof Array) {
+		for (var i = 0; i < dim && i < initdata.length; i++)
+			this.data[i] = initdata[i];
+	}
+};
+
+NumJS.PMatrix.prototype = new NumJS.GenericMatrix();
+
+NumJS.PMatrix.prototype.get = function(i, j) {
+	if (this.data[j] == i)
+		return 1;
+	return 0;
+};
+
+// The PMatrix .data array stores the row number of the '1' in each column.
+// therefore column pivoting is trivial and row pivoting must be performed indirectly
+
+NumJS.PMatrix.prototype.pivot_col = function(i, j) {
+	var tmp = this.data[i];
+	this.data[i] = this.data[j];
+	this.data[j] = tmp;
+};
+
+NumJS.PMatrix.prototype.pivot_row = function(i, j) {
+	i = this.data.indexOf(i);
+	j = this.data.indexOf(j);
+	this.pivot_col(i, j);
+};
+
+NumJS.PMatrix.prototype.op_transp = function(a) {
+	if (a instanceof NumJS.PMatrix)
+	{
+		var result = new NumJS.PMatrix(a.rows);
+		for (var i = 0; i < a.rows; i++) {
+			var j = a.data[i];
+			result.data[j] = i;
+		}
+		return result;
+	}
+	throw "NumJS.Matrix type error";
+};
+
+NumJS.PMatrix.prototype.op_mul = function(a, b) {
+	if ((a instanceof NumJS.PMatrix) && (b instanceof NumJS.PMatrix))
+	{
+		if (a.cols != b.rows)
+			throw "NumJS.Matrix dimension mismatch";
+		var result = new NumJS.PMatrix(a.rows);
+		for (var i = 0; i < a.rows; i++)
+			result.data[i] = a.data[b.data[i]];
+		return result;
+	}
+	// Fallback to normal matrix-matrix multiplikation
+	return NumJS.GenericMatrix.prototype.op_mul(a, b);
+};
+
+NumJS.PMatrix.prototype.op_conj = NumJS.PMatrix.prototype.op_transp;
+NumJS.PMatrix.prototype.op_inv = NumJS.PMatrix.prototype.op_transp;
+
