@@ -116,7 +116,7 @@ There are no special vector classes. So vectors must simply be created as
 Nx1 matrices.
 
 Matrix-Matrix and Matrix-Scalar operations can be performed using the
-uppercase NumJS.* metioned above and work as one would expect it:
+uppercase NumJS.* metioned above and work as one would expect it. E.g.:
 
 	var A = NumJS.RMatrix(2, 2, [1, 2, 3, 4]);
 
@@ -132,5 +132,5 @@ Note that also permutation matrices provide a .get(row, col) method, but
 lack support of a .set(row, col, value) method.
 
 Matrices also have a .toString() method that is automatically used by
-the interpreter to convert a complex number to a string when needed.
+the interpreter to convert a matrix object to a string when needed.
 
