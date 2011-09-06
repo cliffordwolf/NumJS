@@ -33,12 +33,11 @@ for (i in binOps)
 				NumJS[binOps[i]](operandExamples[j], operandExamples[k]);
 			} catch (e) {
 				isOk = 0;
+				e = "X"; // e = (e + "").replace(/ /, "<br/>");
+				document.write("<td style=\"background-color: #f00;\">" + e + "</td>");
 			}
-			if (isOk) {
+			if (isOk)
 				document.write("<td style=\"background-color: #0f0;\">OK</td>");
-			} else {
-				document.write("<td style=\"background-color: #f00;\">X</td>");
-			}
 		}
 		document.write("</tr>\n");
 	}
@@ -61,12 +60,11 @@ for (i in uniOps) {
 			NumJS[uniOps[i]](operandExamples[k]);
 		} catch (e) {
 			isOk = 0;
+			e = "X"; // e = (e + "").replace(/ /, "<br/>");
+			document.write("<td style=\"background-color: #f00;\">" + e + "</td>");
 		}
-		if (isOk) {
+		if (isOk)
 			document.write("<td style=\"background-color: #0f0;\">OK</td>");
-		} else {
-			document.write("<td style=\"background-color: #f00;\">X</td>");
-		}
 	}
 	document.write("</tr>\n");
 }

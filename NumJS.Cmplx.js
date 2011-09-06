@@ -75,7 +75,15 @@ NumJS.Cmplx.prototype =
 		throw "NumJS.Cmplx type error";
 	},
 	op_dot: function(a, b) {
-		return this.op_mul(a, b);
+		if ((a instanceof NumJS.Cmplx) && (b instanceof NumJS.Cmplx))
+			return NumJS.C(a.re*b.re - a.im*b.im, a.re*b.im + a.im*b.re);
+		if ((a instanceof NumJS.Cmplx) && (typeof(b) == "number"))
+			return NumJS.C(a.re * b, a.im * b);
+		if ((typeof(a) == "number") && (b instanceof NumJS.Cmplx))
+			return NumJS.C(a * b.re, a * b.im);
+		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_dot) == "function"))
+			return b.op_dot(a, b);
+		throw "NumJS.Cmplx type error";
 	},
 	op_div: function(a, b) {
 		if ((a instanceof NumJS.Cmplx) && (b instanceof NumJS.Cmplx))
@@ -106,6 +114,9 @@ NumJS.Cmplx.prototype =
 	},
 	op_conj: function(a) {
 		return NumJS.C(a.re, -a.im);
+	},
+	op_transp: function(a) {
+		return a;
 	},
 	op_re: function(a) {
 		return a.re;
