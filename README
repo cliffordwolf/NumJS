@@ -44,7 +44,7 @@ following NumJS function:
 	NumJS.INV(x)           .... 1/x
 	NumJS.NEG(x)           .... -x
 	NumJS.ABS(x)           .... abs(x)
-	NumJS.NORM(x)          .... norm(x)
+	NumJS.NORM(x)          .... norm(x)  (euclidean norm)
 	NumJS.ARG(x)           .... arg(x)
 	NumJS.CONJ(x)          .... conjugate(x)
 	NumJS.TRANSP(x)        .... transpose(x)
