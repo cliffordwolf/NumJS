@@ -90,9 +90,10 @@ NumJS.Cmplx.prototype =
 		throw "NumJS.Cmplx type error";
 	},
 	op_inv: function(a) {
-		if (a instanceof NumJS.Cmplx)
-			return NumJS.C(1 / (a.re*a.re + a.im*a.im), -a.im / (a.re*a.re + a.im*a.im));
-		throw "NumJS.Cmplx type error";
+		return NumJS.C(1 / (a.re*a.re + a.im*a.im), -a.im / (a.re*a.re + a.im*a.im));
+	},
+	op_neg: function(a) {
+		return NumJS.C(-a.re, -a.im);
 	},
 	op_abs: function(a) {
 		return Math.sqrt(a.re*a.re + a.im*a.im);

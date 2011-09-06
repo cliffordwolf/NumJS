@@ -82,6 +82,14 @@ NumJS.INV = function(a) {
 	throw "NumJS.GenOps type error";
 };
 
+NumJS.NEG = function(a) {
+	if (typeof(a.op_neg) == "function")
+		return a.op_neg(a);
+	if (typeof(a) == "number")
+		return -a;
+	throw "NumJS.GenOps type error";
+};
+
 NumJS.ABS = function(a) {
 	if (typeof(a.op_abs) == "function")
 		return a.op_abs(a);

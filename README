@@ -2,5 +2,131 @@
 NumJS -- A JavaScript library for numerical computing
 =====================================================
 
-... TBD ...
+       *** This library is work in progress ***
+
+This library provides:
+
+    - classes and functions for doing computations with
+        * Real and Complex Numbers
+        * Real and Complex Matrices
+        * Permutation Matrices
+
+    - linear decompositon and linear solver:
+        * LU and PLU decomposition (incl. solver) [TBD]
+	* QR decomposition [TBD]
+	* singular value decomposition [TBD]
+        * linear least-squares fitter [TBD]
+
+    - special functions:
+        * B-spline basis functions [TBD]
+	* Gauss error function [TBD]
+        * Lambert W-functions [TBD]
+
+    - polynomials:
+        * evaluating polynomials [TBD]
+        * numerical polynomial solver [TBD]
+
+
+Real and Complex Numbers
+------------------------
+
+JavaScript does not support operator overloading. So in all arithmetric that
+might involve objects other then real numbers must be performed via the
+following NumJS function:
+
+	NumJS.ADD(x, y)   .... for x + y
+	NumJS.SUB(x, y)   .... for x - y
+	NumJS.MUL(x, y)   .... for x * y
+	NumJS.DOT(x, y)   .... for x . y
+	NumJS.DIV(x, y)   .... for x / y
+	NumJS.POW(x, y)   .... for x ^ y
+
+	NumJS.INV(x)      .... for 1/x
+	NumJS.NEG(x)      .... for -x
+	NumJS.ABS(x)      .... for abs(x)
+	NumJS.NORM(x)     .... for norm(x)
+	NumJS.ARG(x)      .... for arg(x)
+	NumJS.CONJ(x)     .... for conjugate(x)
+	NumJS.TRANSP(x)   .... for transpose(x)
+	NumJS.EXP(x)      .... for e^x
+	NumJS.LOG(x)      .... for log(x)
+	NumJS.RE(x)       .... for real_part(x)
+	NumJS.IM(x)       .... for imaginary_part(x)
+
+Note that not all objects support all operations. Whenever an operation
+is performed on objects that do not support it, a "NumJS.* type error"
+exception is thrown.
+
+The script "opmap.html" generates a table showing the allowed operand
+types for each operation.
+
+For real numbers the native JavaScript number type is used:
+
+	var x = 1.2345;
+
+Complex numbers can be created using the NumJS.C(re, im) helper function:
+
+	var z = NumJS.C(1, 1);
+
+or in polar coordinates using the NumJS.P(abs, arg) helper function:
+
+	var z = NumJS.C(Math.PI/4, Math.sqrt(2));
+
+Complex numbers have a .toString() method that is automatically used by
+the interpreter to convert a complex number to a string when needed.
+
+
+Matrices
+--------
+
+Matrices can be created using one of the following three constructors:
+
+	var realMatrix3x3    = new NumJS.RMatrix(3, 3);
+	var complexMatrix3x3 = new NumJS.CMatrix(3, 3);
+	var permutMatrix3x3  = new NumJS.PMatrix(3);
+
+Real and complex matrices are initialized to all-zeros and can be filled
+using the .set(row, col, value) method. Note that row and column indexes
+start with 0.
+
+Permutation Matrices are initialized to the identity matrix and can be
+modified using the .pivot_col(c1, c2) and .pivot_row(r1, r2) methods,
+that pivot the two specified rows or columns.
+
+Alternatively real and complex matrices can be initialized using their
+constructors by passing and additional array with the initialization
+data in row-major order:
+
+	var realFlipMatrix3x3 = new NumJS.RMatrix(3, 3, [
+		0, 0, 1,
+		0, 1, 0,
+		1, 0, 0
+	]);
+
+Permutation matrices can also be created with initalization data. In this
+case the array must contain the row-number of each '1' per column:
+
+	var permutFlipMatrix3x3 = new NumJS.PMatrix(3, [2, 1, 0]);
+
+There are no special vector classes. So vectors must simply be created as
+Nx1 matrices.
+
+Matrix-Matrix and Matrix-Scalar operations can be performed using the
+uppercase NumJS.* metioned above and work as one would expect it:
+
+	var A = NumJS.RMatrix(2, 2, [1, 2, 3, 4]);
+
+	var B_re = NumJS.RMatrix(2, 2, [5, 6, 7, 8]);
+	var B_im = NumJS.RMatrix(2, 2, [9, 0, 1, 2]);
+	var B = NumJS.ADD(B_re, NumJS.MUL(B_im, NumJS.C(0,1)));
+
+	var Z = NumJS.MUL(A, B);
+
+Individal matrix elements can be accessed using the .get(row, col) method.
+
+Note that also permutation matrices provide a .get(row, col) method, but
+lack support of a .set(row, col, value) method.
+
+Matrices also have a .toString() method that is automatically used by
+the interpreter to convert a complex number to a string when needed.
 
