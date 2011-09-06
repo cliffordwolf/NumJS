@@ -1,0 +1,74 @@
+<body onload="update_status()">
+<script type="text/javascript" src="NumJS.js"></script>
+<script type="text/javascript">NumJS.loader_html("")</script>
+<h3 id="status">Please check the JavaScript Error Console!</h3>
+<script><!--
+
+var tests_pass_count = 0;
+var tests_fail_count = 0;
+
+var tests = [
+	"cmplx001",
+	"matrix001",
+	"matrix002",
+];
+
+function fmt(text)
+{
+        var args = arguments;
+        function replace_arg(_dummy, i) { return i > 0 ? args[i] : "{"; };
+        return text.replace(/\{([0-9]+)\}/g, replace_arg);
+}
+
+function print(text)
+{
+        text = text.replace(/&/g, "&amp;");
+        text = text.replace(/</g, "&lt;");
+        text = text.replace(/>/g, "&gt;");
+	document.write(text);
+}
+
+function printf(text)
+{
+        var args = arguments;
+        function replace_arg(_dummy, i) { return i > 0 ? args[i] : "{"; };
+        print(text.replace(/\{([0-9]+)\}/g, replace_arg));
+}
+
+function pass_test(t)
+{
+	tests_pass_count++;
+	document.getElementById("box_" + t).setAttribute("style", "background-color: #0a0; padding:0.3em;");
+	document.write('<b>Test "' + t + '" passed.</b>');
+}
+
+function fail_test(t, e)
+{
+	tests_fail_count++;
+	document.getElementById("box_" + t).setAttribute("style", "background-color: #a00; padding:1em;");
+	document.write('<b>Test "' + t + '" failed with error "' + e + '".</b>');
+}
+
+function run_tests()
+{
+	for (var i in tests) {
+		var src = 'tests/' + tests[i] + '.js';
+		document.write('<script type="text/javascript" src="' + src + '"></scr'+'ipt>\n');
+	}
+	for (var i in tests) {
+		document.write('<pre id="box_' + tests[i] + '" style="background-color: #f00;">');
+		document.write('<script type="text/javascript">try { test_' + tests[i] +
+				'(); pass_test("' + tests[i] + '"); } catch (e) { fail_test("' +
+				tests[i] + '", e); }</scr'+'ipt>');
+		document.write('</pre>\n');
+	}
+}
+
+function update_status()
+{
+	document.getElementById("status").firstChild.nodeValue = "Tests passed: " + tests_pass_count + ", Tests failed: " + tests_fail_count;
+}
+
+run_tests();
+
+//--></script></body>
