@@ -21,9 +21,6 @@
 
 "use strict";
 
-if (typeof(NumJS) == "undefined")
-	var NumJS = new Object();
-
 // Generic Matrix -- do not instanciate directly!
 
 NumJS.GenericMatrix = function(rows, cols) {

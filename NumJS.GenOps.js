@@ -21,9 +21,6 @@
 
 "use strict";
 
-if (typeof(NumJS) == "undefined")
-	var NumJS = new Object();
-
 NumJS.ADD = function(a, b) {
 	if (typeof(a.op_add) == "function")
 		return a.op_add(a, b);

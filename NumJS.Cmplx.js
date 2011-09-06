@@ -21,9 +21,6 @@
 
 "use strict";
 
-if (typeof(NumJS) == "undefined")
-	var NumJS = new Object();
-
 NumJS.Cmplx = function(re, im) {
 	this.re = re;
 	this.im = im;
