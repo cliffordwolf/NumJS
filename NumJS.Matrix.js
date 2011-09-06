@@ -179,6 +179,51 @@ NumJS.GenericMatrix.prototype =
 		}
 		throw "NumJS.Matrix type error";
 	},
+	op_eq: function(a, b) {
+		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
+		{
+			if (a.cols != b.cols || a.rows != b.rows)
+				throw "NumJS.Matrix dimension mismatch";
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < b.cols; j++)
+				if (!NumJS.EQ(a.get(i, j), b.get(i, j)))
+					return false;
+			return true;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_eq) == "function"))
+			return b.op_eq(a, b);
+		throw "NumJS.Matrix type error";
+	},
+	op_eq_abs: function(a, b, d) {
+		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
+		{
+			if (a.cols != b.cols || a.rows != b.rows)
+				throw "NumJS.Matrix dimension mismatch";
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < b.cols; j++)
+				if (!NumJS.EQ_ABS(a.get(i, j), b.get(i, j), d))
+					return false;
+			return true;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_eq_abs) == "function"))
+			return b.op_eq_abs(a, b);
+		throw "NumJS.Matrix type error";
+	},
+	op_eq_rel: function(a, b, d) {
+		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
+		{
+			if (a.cols != b.cols || a.rows != b.rows)
+				throw "NumJS.Matrix dimension mismatch";
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < b.cols; j++)
+				if (!NumJS.EQ_REL(a.get(i, j), b.get(i, j), d))
+					return false;
+			return true;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_eq_rel) == "function"))
+			return b.op_eq_rel(a, b);
+		throw "NumJS.Matrix type error";
+	},
 	toString: function() {
 		var str = "[ ";
 		for (var i=0; i < this.rows; i++)

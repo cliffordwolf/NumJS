@@ -124,6 +124,45 @@ NumJS.Cmplx.prototype =
 	op_im: function(a) {
 		return a.im;
 	},
+	op_eq: function(a, b) {
+		if ((a instanceof NumJS.Cmplx) && (b instanceof NumJS.Cmplx))
+			return a.re == b.re && a.im == b.im;
+		if ((a instanceof NumJS.Cmplx) && (typeof(b) == "number"))
+			return a.re == b && a.im == 0;
+		if ((typeof(a) == "number") && (b instanceof NumJS.Cmplx))
+			return a == b.re && 0 == b.im;
+		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_eq) == "function"))
+			return b.op_eq(a, b);
+		throw "NumJS.Cmplx type error";
+	},
+	op_eq_abs: function(a, b, d) {
+		if ((a instanceof NumJS.Cmplx) && (b instanceof NumJS.Cmplx))
+			return Math.abs(a.re - b.re) <= d && Math.abs(a.im - b.im) <= d;
+		if ((a instanceof NumJS.Cmplx) && (typeof(b) == "number"))
+			return Math.abs(a.re - b) <= d && Math.abs(a.im - 0) <= d;
+		if ((typeof(a) == "number") && (b instanceof NumJS.Cmplx))
+			return Math.abs(a - b.re) <= d && Math.abs(0 - b.im) <= d;
+		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_eq) == "function"))
+			return b.op_eq_abs(a, b);
+		throw "NumJS.Cmplx type error";
+	},
+	op_eq_rel: function(a, b, d) {
+		if ((a instanceof NumJS.Cmplx) && (b instanceof NumJS.Cmplx)) {
+			d *= Math.min(this.op_abs(a), this.op_abs(b));
+			return Math.abs(a.re - b.re) <= d && Math.abs(a.im - b.im) <= d;
+		}
+		if ((a instanceof NumJS.Cmplx) && (typeof(b) == "number")) {
+			d *= Math.min(this.op_abs(a), Math.abs(b));
+			return Math.abs(a.re - b) <= d && Math.abs(a.im - 0) <= d;
+		}
+		if ((typeof(a) == "number") && (b instanceof NumJS.Cmplx)) {
+			d *= Math.min(Math.abs(a), this.op_abs(b));
+			return Math.abs(a - b.re) <= d && Math.abs(0 - b.im) <= d;
+		}
+		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_eq) == "function"))
+			return b.op_eq_rel(a, b);
+		throw "NumJS.Cmplx type error";
+	},
 	toString: function() {
 		return "(" + this.re + "+" + this.im + "i)";
 	}

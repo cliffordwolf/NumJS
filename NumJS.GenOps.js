@@ -172,3 +172,33 @@ NumJS.IM = function(a) {
 	throw "NumJS.GenOps type error";
 };
 
+NumJS.EQ = function(a, b) {
+	if (typeof(a.op_eq) == "function")
+		return a.op_eq(a, b);
+	if (typeof(b.op_eq) == "function")
+		return b.op_eq(a, b);
+	if (typeof(a) == "number" && typeof(b) == "number")
+		return a == b;
+	throw "NumJS.GenOps type error";
+};
+
+NumJS.EQ_ABS = function(a, b, d) {
+	if (typeof(a.op_eq) == "function")
+		return a.op_eq_abs(a, b, d);
+	if (typeof(b.op_eq) == "function")
+		return b.op_eq_abs(a, b, d);
+	if (typeof(a) == "number" && typeof(b) == "number")
+		return Math.abs(a - b) <= d;
+	throw "NumJS.GenOps type error";
+};
+
+NumJS.EQ_REL = function(a, b, d) {
+	if (typeof(a.op_eq) == "function")
+		return a.op_eq_rel(a, b, d);
+	if (typeof(b.op_eq) == "function")
+		return b.op_eq_rel(a, b, d);
+	if (typeof(a) == "number" && typeof(b) == "number")
+		return Math.abs(a - b) <= d * Math.min(Math.abs(a), Math.abs(b));
+	throw "NumJS.GenOps type error";
+};
+

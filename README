@@ -34,24 +34,28 @@ JavaScript does not support operator overloading. So in all arithmetric that
 might involve objects other then real numbers must be performed via the
 following NumJS function:
 
-	NumJS.ADD(x, y)   .... for x + y
-	NumJS.SUB(x, y)   .... for x - y
-	NumJS.MUL(x, y)   .... for x * y
-	NumJS.DOT(x, y)   .... for x . y
-	NumJS.DIV(x, y)   .... for x / y
-	NumJS.POW(x, y)   .... for x ^ y
+	NumJS.ADD(x, y)        .... x + y
+	NumJS.SUB(x, y)        .... x - y
+	NumJS.MUL(x, y)        .... x * y
+	NumJS.DOT(x, y)        .... x . y
+	NumJS.DIV(x, y)        .... x / y
+	NumJS.POW(x, y)        .... x ^ y
 
-	NumJS.INV(x)      .... for 1/x
-	NumJS.NEG(x)      .... for -x
-	NumJS.ABS(x)      .... for abs(x)
-	NumJS.NORM(x)     .... for norm(x)
-	NumJS.ARG(x)      .... for arg(x)
-	NumJS.CONJ(x)     .... for conjugate(x)
-	NumJS.TRANSP(x)   .... for transpose(x)
-	NumJS.EXP(x)      .... for e^x
-	NumJS.LOG(x)      .... for log(x)
-	NumJS.RE(x)       .... for real_part(x)
-	NumJS.IM(x)       .... for imaginary_part(x)
+	NumJS.INV(x)           .... 1/x
+	NumJS.NEG(x)           .... -x
+	NumJS.ABS(x)           .... abs(x)
+	NumJS.NORM(x)          .... norm(x)
+	NumJS.ARG(x)           .... arg(x)
+	NumJS.CONJ(x)          .... conjugate(x)
+	NumJS.TRANSP(x)        .... transpose(x)
+	NumJS.EXP(x)           .... e^x
+	NumJS.LOG(x)           .... log(x)
+	NumJS.RE(x)            .... real_part(x)
+	NumJS.IM(x)            .... imaginary_part(x)
+
+	NumJS.EQ(x, y)         .... x == y
+	NumJS.EQ_ABS(x, y, d)  .... x == y  (with max abs error d)
+	NumJS.EQ_REL(x, y, d)  .... x == y  (with max rel error d)
 
 Note that not all objects support all operations. Whenever an operation
 is performed on objects that do not support it, a "NumJS.* type error"
