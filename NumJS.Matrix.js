@@ -389,6 +389,10 @@ NumJS.RMatrix = function(rows, cols, initdata) {
 	}
 };
 
+NumJS.RM = function(rows, cols, initdata) {
+	return new NumJS.RMatrix(rows, cols, initdata);
+};
+
 NumJS.RMatrix.prototype = new NumJS.GenericMatrix();
 
 NumJS.RMatrix.prototype.get = function(i, j) {
@@ -426,6 +430,10 @@ NumJS.CMatrix = function(rows, cols, initdata) {
 	}
 };
 
+NumJS.CM = function(rows, cols, initdata) {
+	return new NumJS.CMatrix(rows, cols, initdata);
+};
+
 NumJS.CMatrix.prototype = new NumJS.GenericMatrix();
 
 NumJS.CMatrix.prototype.get = function(i, j) {
@@ -451,6 +459,10 @@ NumJS.PMatrix = function(dim, initdata) {
 		for (var i = 0; i < dim && i < initdata.length; i++)
 			this.data[i] = initdata[i];
 	}
+};
+
+NumJS.PM = function(dim, initdata) {
+	return new NumJS.PMatrix(dim, initdata);
 };
 
 NumJS.PMatrix.prototype = new NumJS.GenericMatrix();
