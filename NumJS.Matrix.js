@@ -149,6 +149,49 @@ NumJS.GenericMatrix.prototype =
 			return b.op_dot(a, b);
 		throw "NumJS.Matrix type error";
 	},
+	op_div: function(a, b) {
+		var aIsMatrix = a instanceof NumJS.GenericMatrix;
+		var bIsScalar = typeof(b) == "number" || b instanceof NumJS.Cmplx;
+		if (aIsMatrix && bIsScalar)
+		{
+			var result;
+			if ((a instanceof NumJS.CMatrix) || (b instanceof NumJS.CMatrix))
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < a.cols; j++)
+				result.set(i, j, NumJS.DIV(a.get(i, j), b));
+			return result;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_div) == "function"))
+			return b.op_div(a, b);
+		throw "NumJS.Matrix type error";
+	},
+	op_pow: function(a, b) {
+		var aIsMatrix = a instanceof NumJS.GenericMatrix;
+		var bIsScalar = typeof(b) == "number" || b instanceof NumJS.Cmplx;
+		if (aIsMatrix && bIsScalar)
+		{
+			var result;
+			if (a.cols != a.rows)
+				throw "NumJS.Matrix dimension mismatch";
+			if (NumJS.IM(b) != 0 || NumJS.RE(b) != Math.round(NumJS.RE(b)) || NumJS.RE(b) < 0)
+				throw "NumJS.Matrix negative, fractional or complex matrix power";
+			if ((a instanceof NumJS.CMatrix) || (b instanceof NumJS.CMatrix))
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+				result.set(i, i, 1);
+			for (var i=0; i < NumJS.RE(b); i++)
+				result = NumJS.MUL(result, a);
+			return result;
+		}
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_div) == "function"))
+			return b.op_div(a, b);
+		throw "NumJS.Matrix type error";
+	},
 	op_conj: function(a) {
 		if (a instanceof NumJS.GenericMatrix)
 		{
