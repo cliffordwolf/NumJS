@@ -97,6 +97,21 @@ NumJS.Cmplx.prototype =
 			return b.op_div(a, b);
 		throw "NumJS.Cmplx type error";
 	},
+	op_pow: function(a, b) {
+		var aIsScalar = typeof(a) == "number" || a instanceof NumJS.Cmplx;
+		var bIsScalar = typeof(b) == "number" || b instanceof NumJS.Cmplx;
+		if (aIsScalar && bIsScalar) {
+			var aIsReal = NumJS.IM(a) == 0;
+			var bIsReal = NumJS.IM(b) == 0;
+			if (aIsReal && bIsReal)
+				return Math.pow(NumJS.RE(a), NumJS.RE(b));
+			if (aIsReal)
+				return NumJS.EXP(NumJS.MUL(b, NumJS.LOG(a)));
+		}
+		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_pow) == "function"))
+			return b.op_pow(a, b);
+		throw "NumJS.Cmplx type error";
+	},
 	op_inv: function(a) {
 		return NumJS.C(1 / (a.re*a.re + a.im*a.im), -a.im / (a.re*a.re + a.im*a.im));
 	},
@@ -117,6 +132,17 @@ NumJS.Cmplx.prototype =
 	},
 	op_transp: function(a) {
 		return a;
+	},
+	op_exp: function(a) {
+		var len = Math.exp(a.re);
+		if (a.im == 0)
+			return len;
+		return NumJS.C(len * Math.cos(a.im), len * Math.sin(a.im));
+	},
+	op_log: function(a) {
+		if (a.im == 0)
+			return Math.log(a.re);
+		throw "NumJS.Cmplx type error";
 	},
 	op_re: function(a) {
 		return a.re;
