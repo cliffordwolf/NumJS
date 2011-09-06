@@ -113,7 +113,7 @@ NumJS.Cmplx.prototype =
 		return a.im;
 	},
 	toString: function() {
-		return this.re + "+" + this.im + "i";
+		return "(" + this.re + "+" + this.im + "i)";
 	}
 };
 
