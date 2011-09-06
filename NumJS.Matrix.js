@@ -192,6 +192,51 @@ NumJS.GenericMatrix.prototype =
 			return b.op_div(a, b);
 		throw "NumJS.Matrix type error";
 	},
+	op_neg: function(a) {
+		if (a instanceof NumJS.GenericMatrix)
+		{
+			var result;
+			if (a instanceof NumJS.CMatrix)
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < a.cols; j++)
+				result.set(i, j, NumJS.NEG(a.get(j, i)));
+			return result;
+		}
+		throw "NumJS.Matrix type error";
+	},
+	op_abs: function(a) {
+		if (a instanceof NumJS.GenericMatrix)
+		{
+			var result;
+			if (a instanceof NumJS.CMatrix)
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < a.cols; j++)
+				result.set(i, j, NumJS.ABS(a.get(j, i)));
+			return result;
+		}
+		throw "NumJS.Matrix type error";
+	},
+	op_arg: function(a) {
+		if (a instanceof NumJS.GenericMatrix)
+		{
+			var result;
+			if (a instanceof NumJS.CMatrix)
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < a.cols; j++)
+				result.set(i, j, NumJS.ARG(a.get(j, i)));
+			return result;
+		}
+		throw "NumJS.Matrix type error";
+	},
 	op_conj: function(a) {
 		if (a instanceof NumJS.GenericMatrix)
 		{
@@ -218,6 +263,36 @@ NumJS.GenericMatrix.prototype =
 			for (var i=0; i < a.rows; i++)
 			for (var j=0; j < a.cols; j++)
 				result.set(i, j, a.get(j, i));
+			return result;
+		}
+		throw "NumJS.Matrix type error";
+	},
+	op_re: function(a) {
+		if (a instanceof NumJS.GenericMatrix)
+		{
+			var result;
+			if (a instanceof NumJS.CMatrix)
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < a.cols; j++)
+				result.set(i, j, NumJS.RE(a.get(j, i)));
+			return result;
+		}
+		throw "NumJS.Matrix type error";
+	},
+	op_im: function(a) {
+		if (a instanceof NumJS.GenericMatrix)
+		{
+			var result;
+			if (a instanceof NumJS.CMatrix)
+				result = new NumJS.CMatrix(a.rows, a.cols);
+			else
+				result = new NumJS.RMatrix(a.rows, a.cols);
+			for (var i=0; i < a.rows; i++)
+			for (var j=0; j < a.cols; j++)
+				result.set(i, j, NumJS.IM(a.get(j, i)));
 			return result;
 		}
 		throw "NumJS.Matrix type error";
