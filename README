@@ -26,6 +26,9 @@ This library provides:
         * evaluating polynomials [TBD]
         * numerical polynomial solver [TBD]
 
+The items marked as [TBD] aren't implemented yet. Feel free to implement
+them (and/or other stuff) and send my your pull requests.
+
 
 Real and Complex Numbers
 ------------------------
@@ -164,4 +167,16 @@ matrices if the factorized matrix was real and complex matrices otherwise.
 
 Per definition .L is a lower triangular matrix with all ones on the main
 diagonal and .U is an upper triangular matrix.
+
+The PLU.solve(Y) method solves a linear system using the factorization:
+
+	// solve A*X = Y for X:
+	var A = NumJS.CM(n, n, [ ... ]);
+	var Y = NumJS.CM(n, k, [ ... ]);
+	var X = A.PLU().solve(Y);
+
+The PLU.det() method calculates the matrix determinant using the
+factorization (product along the diagonal of U times sign of P). The
+NumJS.DET(M) operator is using PLU.det() behind the scenes to
+calculate a matrix determinant.
 
