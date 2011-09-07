@@ -140,3 +140,63 @@ NumJS.GenericMatrix.prototype.PLU = function()
 	return this.cache["PLU"];
 };
 
+NumJS.GenericPLU.prototype.det = function()
+{
+	var result = this.P.sign;
+	for (var k = 0; k < this.U.rows; k++)
+		result = NumJS.MUL(result, this.U.get(k, k));
+	return result;
+}
+
+NumJS.GenericPLU.prototype.solve = function(Y)
+{
+	if (!(Y instanceof NumJS.GenericMatrix))
+		throw "NumJS.MatLU type error";
+
+	var n = this.P.rows;
+	if (n != Y.rows)
+		throw "NumJS.MatLU dimension mismatch";
+
+	var X;
+	if (Y instanceof NumJS.CMatrix || this.U instanceof NumJS.CMatrix)
+		X = NumJS.CM(n, Y.cols);
+	else
+		X = NumJS.RM(n, Y.cols);
+
+	for (var k = 0; k < Y.cols; k++)
+	{
+		// LU*x = y  =>  L*c = y  and  U*x = c
+		var y = new Array();
+		var c = new Array();
+		var x = new Array();
+
+		// Initialize y, c and x
+		for (var i = 0; i < n; i++) {
+			y[this.P.data[i]] = Y.get(i, k);
+			c[i] = x[i] = 0;
+		}
+
+		// Solve L*c = y
+		for (var i = 0; i < n; i++) {
+			var pivot = this.L.get(i, i);
+			c[i] = NumJS.DIV(y[i], pivot);
+			for (var j = i+1; j < n; j++)
+				y[j] = NumJS.SUB(y[j], NumJS.MUL(c[i], this.L.get(j, i)));
+		}
+
+		// Solve U*x = c
+		for (var i = n-1; i >= 0; i--) {
+			var pivot = this.U.get(i, i);
+			x[i] = NumJS.DIV(c[i], pivot);
+			for (var j = i-1; j >= 0; j--)
+				c[j] = NumJS.SUB(c[j], NumJS.MUL(x[i], this.U.get(j, i)));
+		}
+
+		// Store x in X
+		for (var i = 0; i < n; i++)
+			X.set(i, k, x[i]);
+	}
+
+	return X;
+}
+
