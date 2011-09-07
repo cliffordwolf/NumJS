@@ -40,5 +40,7 @@ function test_Matrix_002()
 	printf("P1 = {1}\n", P1);
 	printf("P2 = {1}\n", P2);
 	printf("P1*P2 == {1}\n", NumJS.MUL(P1, P2));
+
+	checklog(0xb4de);
 }
 

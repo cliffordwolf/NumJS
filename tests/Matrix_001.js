@@ -14,5 +14,7 @@ function test_Matrix_001()
 	printf("B_im: {1}\n", B_im);
 	printf("B: {1}\n", B);
 	printf("Z: {1}\n", Z);
+
+	checklog(0xf177);
 }
 
