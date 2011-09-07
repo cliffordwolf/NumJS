@@ -50,6 +50,7 @@ following NumJS function:
 	NumJS.TRANSP(x)        .... transpose(x)
 	NumJS.EXP(x)           .... e^x
 	NumJS.LOG(x)           .... log(x)
+	NumJS.DET(x)           .... det(x)
 	NumJS.RE(x)            .... real_part(x)
 	NumJS.IM(x)            .... imaginary_part(x)
 

@@ -143,6 +143,9 @@ NumJS.Cmplx.prototype =
 			return Math.log(a.re);
 		throw "NumJS.Cmplx type error";
 	},
+	op_det: function(a) {
+		return a;
+	},
 	op_re: function(a) {
 		return a.re;
 	},

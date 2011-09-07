@@ -153,6 +153,14 @@ NumJS.LOG = function(a) {
 	throw "NumJS.GenOps type error";
 };
 
+NumJS.DET = function(a) {
+	if (typeof(a.op_det) == "function")
+		return a.op_det(a);
+	if (typeof(a) == "number")
+		return a;
+	throw "NumJS.GenOps type error";
+};
+
 NumJS.RE = function(a) {
 	if (typeof(a.op_re) == "function")
 		return a.op_re(a);

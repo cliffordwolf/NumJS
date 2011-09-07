@@ -290,6 +290,12 @@ NumJS.GenericMatrix.prototype =
 		}
 		throw "NumJS.Matrix type error";
 	},
+	op_det: function(a) {
+		var PLU = a.PLU();
+		if (PLU == null)
+			return 0;
+		return PLU.det();
+	},
 	op_re: function(a) {
 		if (a instanceof NumJS.GenericMatrix)
 		{
@@ -577,6 +583,10 @@ NumJS.PMatrix.prototype.op_mul = function(a, b) {
 	}
 	// Fallback to normal matrix-matrix multiplikation
 	return NumJS.GenericMatrix.prototype.op_mul(a, b);
+};
+
+NumJS.PMatrix.prototype.op_det = function(a) {
+	return a.sign;
 };
 
 NumJS.PMatrix.prototype.op_conj = NumJS.PMatrix.prototype.op_transp;
