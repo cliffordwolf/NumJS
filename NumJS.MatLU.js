@@ -21,20 +21,49 @@
 
 "use strict";
 
-var NumJS = new Object();
-
-NumJS.modules = [
-	"GenOps",
-	"Cmplx",
-	"Matrix",
-	"MatLU",
-];
-
-NumJS.loader_html = function(prefix)
+NumJS.GenericPLU = function(P, L, U)
 {
-	for (var i in NumJS.modules) {
-		var src = prefix + 'NumJS.' + NumJS.modules[i] + '.js';
-		document.write('<script type="text/javascript" src="' + src + '"></script>\n');
+	this.P = P;
+	this.L = L;
+	this.U = U;
+};
+
+NumJS.GenericMatrix.prototype.LU = function()
+{
+	var A, P, L, U;
+	var n = this.rows;
+
+	if (this.rows != this.cols)
+		throw "NumJS.MatLU dimension mismatch";
+
+	// in this LU solver P is just the identity
+	P = NumJS.PM(n);
+
+	if (this instanceof NumJS.CMatrix)
+		L = NumJS.CM(n, n);
+	else
+		L = NumJS.RM(n, n);
+
+	A = this.copy();
+	U = this.copy();
+
+	for (var k = 0; k < n; k++)
+	{
+		L.set(k, k, 1);
+		for (var i = k+1; i < n; i++) {
+			var pivot = U.get(k, k);
+			if (pivot == 0)
+				return null;
+			L.set(i, k, NumJS.DIV(U.get(i, k), pivot));
+			for (var j = k+1; j < n; j++)
+				U.set(i, j, NumJS.SUB(U.get(i, j), NumJS.MUL(L.get(i, k), U.get(k, j))));
+		}
 	}
+
+	for (var i = 1; i < n; i++)
+	for (var j = 0; j < i; j++)
+		U.set(i, j, 0);
+
+	return new NumJS.GenericPLU(P, L, U);
 };
 
