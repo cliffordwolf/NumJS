@@ -11,15 +11,15 @@ This library provides:
         * Real and Complex Matrices
         * Permutation Matrices
 
-    - linear decompositon and linear solver:
-        * LU and PLU decomposition (incl. solver) [TBD]
-	* QR decomposition [TBD]
-	* singular value decomposition [TBD]
+    - linear decompositons and linear solvers:
+        * LU and PLU decomposition
+        * QR decomposition [TBD]
+        * singular value decomposition [TBD]
         * linear least-squares fitter [TBD]
 
     - special functions:
         * B-spline basis functions [TBD]
-	* Gauss error function [TBD]
+        * Gauss error function [TBD]
         * Lambert W-functions [TBD]
 
     - polynomials:
@@ -136,9 +136,31 @@ converts permutation matrices into real matrices. If this is not the desired
 behavior, use the .clone() method instead.
 
 The dimension of a Matrix is stored in its .rows and .cols properties.
-A permutation matrix has an additional .sign property that stores the
-sign of the permotation.
+A permutation matrix has an additional .sign property that holds the
+sign of the permutation.
 
 Matrices also have a .toString() method that is automatically used by
 the interpreter to convert a matrix object to a string when needed.
+
+
+PA = LU factorization and solver
+--------------------------------
+
+Each Matrix object provides the functions .LU() and .PLU() that perform
+an LU factorization and return a PLU object when the factorization was
+successful and null if the Matrix can't be factorized.
+
+The result of a factorization is cached. So successive callc to .LU()
+or .PLU() do not introduce any significant performance problem.
+
+The .LU() method performs LU factorization without pivoting and .PLU()
+performs factorization with pivoting. In most cases factorization with
+pivoting is prefered over factorization without pivoting.
+
+The PLU object stores the factorization in the properties .P, .L and .U
+with .P beeing a permutation matrix object and .L and .U beeing real
+matrices if the factorized matrix was real and complex matrices otherwise.
+
+Per definition .L is a lower triangular matrix with all ones on the main
+diagonal and .U is an upper triangular matrix.
 

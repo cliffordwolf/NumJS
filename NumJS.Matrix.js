@@ -23,14 +23,7 @@
 
 // Generic Matrix -- do not instanciate directly!
 
-NumJS.GenericMatrix = function(rows, cols) {
-	this.rows = rows;
-	this.cols = cols;
-};
-
-NumJS.Matrix = function(rows, cols) {
-	this.rows = rows;
-	this.cols = cols;
+NumJS.GenericMatrix = function() {
 };
 
 NumJS.GenericMatrix.prototype =
@@ -395,6 +388,7 @@ NumJS.RMatrix = function(rows, cols, initdata) {
 		this.data = new Float32Array(this.rows * this.cols);
 	else
 		this.data = Array();
+	this.cache = new Object();
 	for (var i=0; i < this.rows; i++)
 	for (var j=0; j < this.cols; j++)
 		this.data[i*this.cols + j] = 0;
@@ -420,6 +414,7 @@ NumJS.RMatrix.prototype.get = function(i, j) {
 NumJS.RMatrix.prototype.set = function(i, j, v) {
 	var idx = i*this.cols + j;
 	this.data[idx] = v;
+	this.cache = new Object();
 };
 
 // Matrix of complex values
@@ -434,6 +429,7 @@ NumJS.CMatrix = function(rows, cols, initdata) {
 		this.re_data = Array();
 		this.im_data = Array();
 	}
+	this.cache = new Object();
 	for (var i=0; i < this.rows; i++)
 	for (var j=0; j < this.cols; j++) {
 		this.re_data[i*this.cols + j] = 0;
@@ -464,6 +460,7 @@ NumJS.CMatrix.prototype.set = function(i, j, v) {
 	var idx = i*this.cols + j;
 	this.re_data[idx] = NumJS.RE(v);
 	this.im_data[idx] = NumJS.IM(v);
+	this.cache = new Object();
 };
 
 // Permutation Matrix
@@ -473,6 +470,7 @@ NumJS.PMatrix = function(dim, initdata) {
 	this.rows = dim;
 	this.cols = dim;
 	this.data = Array();
+	this.cache = new Object();
 	for (var i=0; i < dim; i++)
 		this.data[i] = i;
 	if (initdata instanceof Array)
@@ -527,17 +525,21 @@ NumJS.PMatrix.prototype.get = function(i, j) {
 // therefore column pivoting is trivial and row pivoting must be performed indirectly
 
 NumJS.PMatrix.prototype.pivot_col = function(i, j) {
-	var tmp = this.data[i];
-	this.data[i] = this.data[j];
-	this.data[j] = tmp;
-	this.sign *= -1;
+	if (i != j) {
+		var tmp = this.data[i];
+		this.data[i] = this.data[j];
+		this.data[j] = tmp;
+		this.sign *= -1;
+		this.cache = new Object();
+	}
 };
 
 NumJS.PMatrix.prototype.pivot_row = function(i, j) {
-	i = this.data.indexOf(i);
-	j = this.data.indexOf(j);
-	this.pivot_col(i, j);
-	this.sign *= -1;
+	if (i != j) {
+		i = this.data.indexOf(i);
+		j = this.data.indexOf(j);
+		this.pivot_col(i, j);
+	}
 };
 
 NumJS.PMatrix.prototype.clone = function() {
