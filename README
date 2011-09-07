@@ -131,6 +131,10 @@ Individal matrix elements can be accessed using the .get(row, col) method.
 Note that also permutation matrices provide a .get(row, col) method, but
 lack support of a .set(row, col, value) method.
 
+A copy of a matrix can be created using the .copy() method. This method
+converts permutation matrices into real matrices. If this is not the desired
+behavior, use the .clone() method instead.
+
 Matrices also have a .toString() method that is automatically used by
 the interpreter to convert a matrix object to a string when needed.
 

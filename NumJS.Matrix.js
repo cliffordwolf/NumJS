@@ -41,6 +41,21 @@ NumJS.GenericMatrix.prototype =
 	set: function(i, j, v) {
 		throw "NumJS.Matrix called virtual function from NumJS.GenericMatrix";
 	},
+	copy: function() {
+		var result;
+		if (this instanceof NumJS.CMatrix) {
+			result = new NumJS.CMatrix(this.rows, this.cols);
+		} else {
+			result = new NumJS.RMatrix(this.rows, this.cols);
+		}
+		for (var i=0; i < this.rows; i++)
+		for (var j=0; j < this.cols; j++)
+			result.set(i, j, this.get(i, j));
+		return result;
+	},
+	clone: function() {
+		return this.copy();
+	},
 	op_add: function(a, b) {
 		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
 		{
@@ -486,6 +501,10 @@ NumJS.PMatrix.prototype.pivot_row = function(i, j) {
 	i = this.data.indexOf(i);
 	j = this.data.indexOf(j);
 	this.pivot_col(i, j);
+};
+
+NumJS.PMatrix.prototype.clone = function() {
+	return new NumJS.PMatrix(this.rows, this.data);
 };
 
 NumJS.PMatrix.prototype.op_transp = function(a) {
