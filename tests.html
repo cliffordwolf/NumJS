@@ -7,12 +7,16 @@
 var tests_pass_count = 0;
 var tests_fail_count = 0;
 
+var errorlog = new Object();
+
 var tests = [
 	"Cmplx_001",
 	"Matrix_001",
 	"Matrix_002",
 	"MatLU_001",
 	"MatLU_002",
+	"MatLU_003",
+	"MatLU_004",
 ];
 
 function fmt(text)
@@ -49,6 +53,7 @@ function fail_test(t, e)
 	tests_fail_count++;
 	document.getElementById("box_" + t).setAttribute("style", "background-color: #a00; padding:1em;");
 	document.write('<b>Test "' + t + '" failed with error "' + e + '".</b>');
+	errorlog[t] = e;
 }
 
 function run_tests()
@@ -68,7 +73,10 @@ function run_tests()
 
 function update_status()
 {
-	document.getElementById("status").firstChild.nodeValue = "Tests passed: " + tests_pass_count + ", Tests failed: " + tests_fail_count;
+	var status = "Tests passed: " + tests_pass_count + ", Tests failed: " + tests_fail_count;
+	if (tests_fail_count > 0)
+		status += " (see window.errorlog for details)";
+	document.getElementById("status").firstChild.nodeValue = status;
 }
 
 run_tests();

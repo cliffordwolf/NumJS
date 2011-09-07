@@ -7,7 +7,6 @@ function test_MatLU_002()
 	for (var j = 0; j < 4; j++)
 		A.set(i, j, Math.floor(Math.random()*100));
 
-
 	printf("A = {1}\n", A);
 
 	var PLU = A.PLU();
