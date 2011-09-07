@@ -7,11 +7,13 @@ function test_MatLU_001()
 	for (var i = 0; i < 4; i++)
 	for (var j = 0; j < 4; j++) {
 		if (i > j)
-			L.set(i, j, Math.floor(Math.random()*9) + 1);
-		if (i == j)
+			L.set(i, j, Math.floor(Math.random()*10));
+		if (i < j)
+			U.set(i, j, Math.floor(Math.random()*10));
+		if (i == j) {
 			L.set(i, j, 1);
-		if (i <= j)
 			U.set(i, j, Math.floor(Math.random()*9) + 1);
+		}
 	}
 
 	var A = NumJS.MUL(L, U);
