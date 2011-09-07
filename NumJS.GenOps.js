@@ -104,8 +104,8 @@ NumJS.NORM = function(a) {
 };
 
 NumJS.ARG = function(a) {
-	if (typeof(a.op_abs) == "function")
-		return a.op_abs(a);
+	if (typeof(a.op_arg) == "function")
+		return a.op_arg(a);
 	if (typeof(a) == "number")
 		return a >= 0 ? 0 : Math.PI;
 	throw "NumJS.GenOps type error";

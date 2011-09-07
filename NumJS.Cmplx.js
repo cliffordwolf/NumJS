@@ -104,6 +104,8 @@ NumJS.Cmplx.prototype =
 				return Math.pow(NumJS.RE(a), NumJS.RE(b));
 			if (aIsReal)
 				return NumJS.EXP(NumJS.MUL(b, NumJS.LOG(a)));
+			if (bIsReal)
+				return NumJS.P(Math.pow(NumJS.ABS(a), NumJS.RE(b)), NumJS.ARG(a) * NumJS.RE(b));
 		}
 		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_pow) == "function"))
 			return b.op_pow(a, b);
@@ -187,7 +189,7 @@ NumJS.Cmplx.prototype =
 		throw "NumJS.Cmplx type error";
 	},
 	toString: function() {
-		return "(" + this.re + "+" + this.im + "i)";
+		return "(" + this.re + (this.im >= 0 ? "+" : "") + this.im + "i)";
 	}
 };
 
