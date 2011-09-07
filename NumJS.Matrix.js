@@ -399,7 +399,9 @@ NumJS.RMatrix = function(rows, cols, initdata) {
 	for (var j=0; j < this.cols; j++)
 		this.data[i*this.cols + j] = 0;
 	if (initdata instanceof Array) {
-		for (var i = 0; i < this.rows*this.cols && i < initdata.length; i++)
+		if (initdata.length != this.rows*this.cols)
+			throw "NumJS.Matrix initdata dimension mismatch";
+		for (var i = 0; i < initdata.length; i++)
 			this.data[i] = initdata[i];
 	}
 };
@@ -438,7 +440,9 @@ NumJS.CMatrix = function(rows, cols, initdata) {
 		this.im_data[i*this.cols + j] = 0;
 	}
 	if (initdata instanceof Array) {
-		for (var i = 0; i < this.rows*this.cols && i < initdata.length; i++) {
+		if (initdata.length != this.rows*this.cols)
+			throw "NumJS.Matrix initdata dimension mismatch";
+		for (var i = 0; i < initdata.length; i++) {
 			this.re_data[i] = NumJS.RE(initdata[i]);
 			this.im_data[i] = NumJS.IM(initdata[i]);
 		}
@@ -465,14 +469,45 @@ NumJS.CMatrix.prototype.set = function(i, j, v) {
 // Permutation Matrix
 
 NumJS.PMatrix = function(dim, initdata) {
+	this.sign = 1;
 	this.rows = dim;
 	this.cols = dim;
 	this.data = Array();
 	for (var i=0; i < dim; i++)
 		this.data[i] = i;
-	if (initdata instanceof Array) {
-		for (var i = 0; i < dim && i < initdata.length; i++)
-			this.data[i] = initdata[i];
+	if (initdata instanceof Array)
+	{
+		var tmp = new Array();
+		if (initdata.length != dim)
+			throw "NumJS.Matrix initdata dimension mismatch";
+		for (var i = 0; i < initdata.length; i++)
+			tmp[i] = this.data[i] = initdata[i];
+
+		// detecting sign: shakersort and count number of exchanges
+		var sort_done = 0;
+		while (!sort_done) {
+			sort_done = 1;
+			for (var i = 1; i < dim; i++)
+				if (tmp[i-1] > tmp[i]) {
+					sort_done = 0;
+					this.sign *= -1;
+					var t = tmp[i-1];
+					tmp[i-1] = tmp[i];
+					tmp[i] = t;
+				}
+			for (var i = dim-1; i > 0; i--)
+				if (tmp[i-1] > tmp[i]) {
+					sort_done = 0;
+					this.sign *= -1;
+					var t = tmp[i-1];
+					tmp[i-1] = tmp[i];
+					tmp[i] = t;
+				}
+		}
+
+		for (var i = 0; i < dim; i++)
+			if (tmp[i] != i)
+				throw "NumJS.Matrix initdata not a permutation";
 	}
 };
 
@@ -495,16 +530,22 @@ NumJS.PMatrix.prototype.pivot_col = function(i, j) {
 	var tmp = this.data[i];
 	this.data[i] = this.data[j];
 	this.data[j] = tmp;
+	this.sign *= -1;
 };
 
 NumJS.PMatrix.prototype.pivot_row = function(i, j) {
 	i = this.data.indexOf(i);
 	j = this.data.indexOf(j);
 	this.pivot_col(i, j);
+	this.sign *= -1;
 };
 
 NumJS.PMatrix.prototype.clone = function() {
-	return new NumJS.PMatrix(this.rows, this.data);
+	var result = new NumJS.PMatrix(this.rows);
+	for (var i = 0; i < this.rows; i++)
+		result.data[i] = this.data[i];
+	result.sign = this.sign;
+	return result;
 };
 
 NumJS.PMatrix.prototype.op_transp = function(a) {
@@ -515,6 +556,7 @@ NumJS.PMatrix.prototype.op_transp = function(a) {
 			var j = a.data[i];
 			result.data[j] = i;
 		}
+		result.sign = a.sign;
 		return result;
 	}
 	throw "NumJS.Matrix type error";
@@ -528,6 +570,7 @@ NumJS.PMatrix.prototype.op_mul = function(a, b) {
 		var result = new NumJS.PMatrix(a.rows);
 		for (var i = 0; i < a.rows; i++)
 			result.data[i] = a.data[b.data[i]];
+		result.sign = a.sign * b.sign;
 		return result;
 	}
 	// Fallback to normal matrix-matrix multiplikation

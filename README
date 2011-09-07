@@ -135,6 +135,10 @@ A copy of a matrix can be created using the .copy() method. This method
 converts permutation matrices into real matrices. If this is not the desired
 behavior, use the .clone() method instead.
 
+The dimension of a Matrix is stored in its .rows and .cols properties.
+A permutation matrix has an additional .sign property that stores the
+sign of the permotation.
+
 Matrices also have a .toString() method that is automatically used by
 the interpreter to convert a matrix object to a string when needed.
 
