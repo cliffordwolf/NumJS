@@ -1,5 +1,5 @@
 
-function test_matrix001()
+function test_Matrix_001()
 {
 	var A = NumJS.RM(2, 2, [1, 2, 3, 4]);
 

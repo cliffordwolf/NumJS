@@ -1,5 +1,5 @@
 
-function test_cmplx001()
+function test_Cmplx_001()
 {
 	var a = NumJS.C(2, 1);
 	var b = NumJS.C(0, 2);
