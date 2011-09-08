@@ -9,7 +9,16 @@ function test_MatLU_004()
 		21,  46,  14,  51,  40
 	]);
 
+	var Y = NumJS.RM(5, 1, [766, 1041, 707, 744, 559]);
+
 	printf("A = {1}\n", A);
+	printf("Y = {1}\n", Y);
+
+	var X = NumJS.SOLVE(A, Y);
+	printf("X = {1}\n", X);
+
+	if (!NumJS.EQ_ABS(X, NumJS.RM(5, 1, [1, 2, 3, 4, 5]), 1e-6))
+		throw "Invalid result for solve(A, Y).";
 
 	var det = A.PLU().det();
 	printf("A.PLU().det() = {1}\n", det);

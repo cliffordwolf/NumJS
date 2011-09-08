@@ -42,6 +42,7 @@ following NumJS function:
 	NumJS.MUL(x, y)        .... x * y
 	NumJS.DOT(x, y)        .... x . y
 	NumJS.DIV(x, y)        .... x / y
+	NumJS.SOLVE(x, y)      .... x \ y
 	NumJS.POW(x, y)        .... x ^ y
 
 	NumJS.INV(x)           .... 1/x
@@ -174,6 +175,11 @@ The PLU.solve(Y) method solves a linear system using the factorization:
 	var A = NumJS.CM(n, n, [ ... ]);
 	var Y = NumJS.CM(n, k, [ ... ]);
 	var X = A.PLU().solve(Y);
+
+This is actually identical to using the NumJS.SOLVE() operator:
+
+	// solve A*X = Y for X:
+	var X = NumJS.SOLVE(A, Y);
 
 The PLU.det() method calculates the matrix determinant using the
 factorization (product along the diagonal of U times sign of P). The

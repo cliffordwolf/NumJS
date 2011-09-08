@@ -173,6 +173,22 @@ NumJS.GenericMatrix.prototype =
 			return b.op_div(a, b);
 		throw "NumJS.Matrix type error";
 	},
+	op_solve: function(a, b) {
+		var aIsMatrix = a instanceof NumJS.GenericMatrix;
+		var bIsMatrix = b instanceof NumJS.GenericMatrix;
+		if (aIsMatrix && bIsMatrix) {
+			var PLU = a.PLU();
+			if (PLU == null)
+				return null;
+			return PLU.solve(b);
+		}
+		var aIsScalar = typeof(a) == "number" || a instanceof NumJS.Cmplx;
+		if (aIsScalar && bIsMatrix)
+			return this.op_div(b, a);
+		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_solve) == "function"))
+			return b.op_solve(a, b);
+		throw "NumJS.Matrix type error";
+	},
 	op_pow: function(a, b) {
 		var aIsMatrix = a instanceof NumJS.GenericMatrix;
 		var bIsScalar = typeof(b) == "number" || b instanceof NumJS.Cmplx;

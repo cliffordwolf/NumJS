@@ -94,6 +94,15 @@ NumJS.Cmplx.prototype =
 			return b.op_div(a, b);
 		throw "NumJS.Cmplx type error";
 	},
+	op_solve: function(a, b) {
+		var aIsScalar = typeof(a) == "number" || a instanceof NumJS.Cmplx;
+		var bIsScalar = typeof(b) == "number" || b instanceof NumJS.Cmplx;
+		if (aIsScalar && bIsScalar)
+			return this.op_div(b, a);
+		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_solve) == "function"))
+			return b.op_solve(a, b);
+		throw "NumJS.Cmplx type error";
+	},
 	op_pow: function(a, b) {
 		var aIsScalar = typeof(a) == "number" || a instanceof NumJS.Cmplx;
 		var bIsScalar = typeof(b) == "number" || b instanceof NumJS.Cmplx;

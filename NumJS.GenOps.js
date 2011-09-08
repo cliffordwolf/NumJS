@@ -71,6 +71,16 @@ NumJS.DIV = function(a, b) {
 	throw "NumJS.GenOps type error";
 };
 
+NumJS.SOLVE = function(a, b) {
+	if (typeof(a.op_solve) == "function")
+		return a.op_solve(a, b);
+	if (typeof(b.op_solve) == "function")
+		return b.op_solve(a, b);
+	if (typeof(a) == "number" && typeof(b) == "number")
+		return b / a;
+	throw "NumJS.GenOps type error";
+};
+
 NumJS.INV = function(a) {
 	if (typeof(a.op_inv) == "function")
 		return a.op_inv(a);
