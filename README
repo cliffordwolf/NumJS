@@ -30,6 +30,29 @@ The items marked as [TBD] aren't implemented yet. Feel free to implement
 them (and/or other stuff) and send my your pull requests.
 
 
+A warning about numerical computing with JavaScript
+---------------------------------------------------
+
+Most JavaScript implementations store numbers as single precision (32bit)
+floating point values, or worse. So the possible applications for JavaScript
+in the world of numerical computing is in fact very limited and tasks like
+calculating the determinant of a large matrix are very unstable.
+
+However, there are applications where the numerical errors of single precision
+floating point arithmetic are within acceptable margins and an implementation
+in JavaScript might be desireable. But as the numerical error in applications
+such as e.g. numerical integration of boundary value problems can become huge,
+you should always make sure that you understand how to estimate the numerical
+errors in the calculation you want to perform before you implement it.
+
+This is of course true for all numerical computing environments, but with
+single precision floating point values you e.g. see problems in solving 10x10
+linear systems that you usually wouldn't see in 100x100 systems when performing
+the same calculations using  double precision floats.
+
+You have been warned. Happy Hacking.
+
+
 Real and Complex Numbers
 ------------------------
 
