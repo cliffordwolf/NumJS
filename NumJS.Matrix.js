@@ -44,6 +44,30 @@ NumJS.GenericMatrix.prototype =
 	clone: function() {
 		return this.copy();
 	},
+	cut: function(i, j, rows, cols) {
+		var result = new Array();
+		for (var y=0; y < rows; y++)
+		for (var x=0; x < cols; x++)
+			result.push(this.get(i+y, j+x));
+		return result;
+	},
+	cut_cm: function(i, j, rows, cols) {
+		var result = new Array();
+		for (var x=0; x < cols; x++)
+		for (var y=0; y < rows; y++)
+			result.push(this.get(i+y, j+x));
+		return result;
+	},
+	paste: function(i, j, rows, cols, data) {
+		for (var y=0; y < rows; y++)
+		for (var x=0; x < cols; x++)
+			this.set(i+y, j+x, data.shift());
+	},
+	paste_cm: function(i, j, rows, cols, data) {
+		for (var x=0; x < cols; x++)
+		for (var y=0; y < rows; y++)
+			this.set(i+y, j+x, data.shift());
+	},
 	op_add: function(a, b) {
 		if ((a instanceof NumJS.GenericMatrix) && (b instanceof NumJS.GenericMatrix))
 		{
