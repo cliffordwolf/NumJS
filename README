@@ -83,7 +83,9 @@ or in polar coordinates using the NumJS.P(abs, arg) helper function:
 	var z = NumJS.C(Math.PI/4, Math.sqrt(2));
 
 Complex numbers have a .toString() method that is automatically used by
-the interpreter to convert a complex number to a string when needed.
+the interpreter to convert a complex number to a string when needed. They
+also have .toFixed() and a .toPrecision() methods that are compatible with
+the generic JavaScript .toFixed() and .toPrecision() number methods.
 
 
 Matrices
@@ -146,7 +148,9 @@ A permutation matrix has an additional .sign property that holds the
 sign of the permutation.
 
 Matrices also have a .toString() method that is automatically used by
-the interpreter to convert a matrix object to a string when needed.
+the interpreter to convert a complex number to a string when needed. They
+also have .toFixed() and a .toPrecision() methods that are compatible with
+the generic JavaScript .toFixed() and .toPrecision() number methods.
 
 
 PA = LU factorization and solver

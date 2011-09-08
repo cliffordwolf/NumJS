@@ -203,8 +203,17 @@ NumJS.Cmplx.prototype =
 			return b.op_eq_rel(a, b);
 		throw "NumJS.Cmplx type error";
 	},
-	toString: function() {
-		return "(" + this.re + (this.im >= 0 ? "+" : "") + this.im + "i)";
+	toString: function(n) {
+		return "(" + this.re.toString(n) + (this.im >= 0 ? "+" : "") +
+				this.im.toString(n) + "i)";
+	},
+	toFixed: function(n) {
+		return "(" + this.re.toFixed(n) + (this.im >= 0 ? "+" : "") +
+				this.im.toFixed(n) + "i)";
+	},
+	toPrecision: function(n) {
+		return "(" + this.re.toPrecision(n) + (this.im >= 0 ? "+" : "") +
+				this.im.toPrecision(n) + "i)";
 	}
 };
 

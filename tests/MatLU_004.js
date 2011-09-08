@@ -14,16 +14,16 @@ function test_MatLU_004()
 	printf("A = {1}\n", A);
 	printf("Y = {1}\n", Y);
 
-	var X = NumJS.SOLVE(A, Y);
+	var X = NumJS.ROUND(NumJS.SOLVE(A, Y));
 	printf("X = {1}\n", X);
 
-	if (!NumJS.EQ_ABS(X, NumJS.RM(5, 1, [1, 2, 3, 4, 5]), 1e-6))
+	if (!NumJS.EQ_ABS(X, NumJS.RM(5, 1, [1, 2, 3, 4, 5]), 1e-3))
 		throw "Invalid result for solve(A, Y).";
 
 	var det = A.PLU().det();
 	printf("A.PLU().det() = {1}\n", det);
 
-	if (!NumJS.EQ_ABS(det, -6370, 1e-6))
+	if (!NumJS.EQ_ABS(det, -6370, 100))
 		throw "Invalid result for det(A).";
 
 	var B = NumJS.CM(3, 3, [
@@ -37,7 +37,7 @@ function test_MatLU_004()
 	var det = B.PLU().det();
 	printf("B.PLU().det() = {1}\n", det);
 
-	if (!NumJS.EQ_ABS(det, NumJS.C(741, 115), 1e-6))
+	if (!NumJS.EQ_ABS(det, NumJS.C(741, 115), 10))
 		throw "Invalid result for det(B).";
 }
 

@@ -32,7 +32,7 @@ function test_MatLU_003()
 
 	var AX = NumJS.MUL(A, X);
 
-	if (!NumJS.EQ_ABS(AX, Y, 1e-6))
+	if (!NumJS.EQ_ABS(AX, Y, 1e-3))
 		throw "Mismatch in AX == Y.";
 }
 

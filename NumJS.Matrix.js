@@ -366,17 +366,32 @@ NumJS.GenericMatrix.prototype =
 			return b.op_eq_rel(a, b);
 		throw "NumJS.Matrix type error";
 	},
-	toString: function() {
+	toStringWorker: function(f) {
 		var str = "[ ";
 		for (var i=0; i < this.rows; i++)
 		{
 			for (var j=0; j < this.cols; j++)
-				str += (j > 0 ? ", " : "") + this.get(i, j);
+				str += (j > 0 ? ", " : "") + f(this.get(i, j));
 			if (i < this.rows-1)
 				str += "; "
 		}
 		str += " ]";
 		return str;
+	},
+	toString: function(n) {
+		return this.toStringWorker(function(v){
+			return v.toString(n);
+		});
+	},
+	toFixed: function(n) {
+		return this.toStringWorker(function(v){
+			return v.toFixed(n);
+		});
+	},
+	toPrecision: function(n) {
+		return this.toStringWorker(function(v){
+			return v.toPrecision(n);
+		});
 	}
 };
 
