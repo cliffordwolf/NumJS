@@ -25,6 +25,7 @@ var NumJS = new Object();
 
 NumJS.modules = [
 	"GenOps",
+	"Parser",
 	"Cmplx",
 	"Matrix",
 	"MatLU",
