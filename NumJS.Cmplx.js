@@ -161,6 +161,9 @@ NumJS.Cmplx.prototype =
 	op_im: function(a) {
 		return a.im;
 	},
+	op_round: function(a, n) {
+		return NumJS.C(NumJS.ROUND(a.re, n), NumJS.ROUND(a.im, n));
+	},
 	op_eq: function(a, b) {
 		if ((a instanceof NumJS.Cmplx) && (b instanceof NumJS.Cmplx))
 			return a.re == b.re && a.im == b.im;

@@ -187,6 +187,18 @@ NumJS.IM = function(a) {
 	throw "NumJS.GenOps type error";
 };
 
+NumJS.ROUND = function(a, n) {
+	if (typeof(n) == "undefined")
+		n = 0;
+	if (typeof(a.op_round) == "function")
+		return a.op_round(a, n);
+	if (typeof(a) == "number") {
+		var factor = Math.pow(10, n);
+		return Math.round(a * factor) / factor;
+	}
+	throw "NumJS.GenOps type error";
+};
+
 NumJS.EQ = function(a, b) {
 	if (typeof(a.op_eq) == "function")
 		return a.op_eq(a, b);
