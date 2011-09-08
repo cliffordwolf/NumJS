@@ -114,11 +114,10 @@ the generic JavaScript .toFixed() and .toPrecision() number methods.
 Matrices
 --------
 
-Matrices can be created using one of the following three functions:
+Matrices can be created using one of the following two functions:
 
-	var realMatrix3x3    = NumJS.RM(3, 3);
-	var complexMatrix3x3 = NumJS.CM(3, 3);
-	var permutMatrix3x3  = NumJS.PM(3);
+	var matrix3x3 = NumJS.MAT(3, 3);
+	var permut3x3 = NumJS.PMAT(3);
 
 Real and complex matrices are initialized to all-zeros and can be filled
 using the .set(row, col, value) method. Note that row and column indexes
@@ -132,7 +131,7 @@ Alternatively real and complex matrices can be initialized using their
 constructors by passing and additional array with the initialization
 data in row-major order:
 
-	var realFlipMatrix3x3 = NumJS.RM(3, 3, [
+	var matrixFlip3x3 = NumJS.MAT(3, 3, [
 		0, 0, 1,
 		0, 1, 0,
 		1, 0, 0
@@ -141,18 +140,18 @@ data in row-major order:
 Permutation matrices can also be created with initalization data. In this
 case the array must contain the row-number of each '1' per column:
 
-	var permutFlipMatrix3x3 = NumJS.PM(3, [2, 1, 0]);
+	var permutFlip3x3 = NumJS.PMAT(3, [2, 1, 0]);
 
-There are no special vector classes. So vectors must simply be created as
+There is no special vector class. So vectors must simply be created as
 Nx1 matrices.
 
 Matrix-Matrix and Matrix-Scalar operations can be performed using the
 uppercase NumJS.* metioned above and work as one would expect it. E.g.:
 
-	var A = NumJS.RM(2, 2, [1, 2, 3, 4]);
+	var A = NumJS.MAT(2, 2, [1, 2, 3, 4]);
 
-	var B_re = NumJS.RM(2, 2, [5, 6, 7, 8]);
-	var B_im = NumJS.RM(2, 2, [9, 0, 1, 2]);
+	var B_re = NumJS.MAT(2, 2, [5, 6, 7, 8]);
+	var B_im = NumJS.MAT(2, 2, [9, 0, 1, 2]);
 	var B = NumJS.ADD(B_re, NumJS.MUL(B_im, NumJS.C(0,1)));
 
 	var Z = NumJS.MUL(A, B);
@@ -200,8 +199,8 @@ diagonal and .U is an upper triangular matrix.
 The PLU.solve(Y) method solves a linear system using the factorization:
 
 	// solve A*X = Y for X:
-	var A = NumJS.CM(n, n, [ ... ]);
-	var Y = NumJS.CM(n, k, [ ... ]);
+	var A = NumJS.MAT(n, n, [ ... ]);
+	var Y = NumJS.MAT(n, k, [ ... ]);
 	var X = A.PLU().solve(Y);
 
 This is actually identical to using the NumJS.SOLVE() operator:

@@ -1,7 +1,7 @@
 
 function test_MatLU_004()
 {
-	var A = NumJS.RM(5, 5, [
+	var A = NumJS.MAT(5, 5, [
 		53,  93,  47,  74,  18,
 		41,  37,  78,  83,  72,
 		59,   8,  99,  75,   7,
@@ -9,7 +9,7 @@ function test_MatLU_004()
 		21,  46,  14,  51,  40
 	]);
 
-	var Y = NumJS.RM(5, 1, [766, 1041, 707, 744, 559]);
+	var Y = NumJS.MAT(5, 1, [766, 1041, 707, 744, 559]);
 
 	printf("A = {1}\n", A);
 	printf("Y = {1}\n", Y);
@@ -17,7 +17,7 @@ function test_MatLU_004()
 	var X = NumJS.ROUND(NumJS.SOLVE(A, Y));
 	printf("X = {1}\n", X);
 
-	if (!NumJS.EQ_ABS(X, NumJS.RM(5, 1, [1, 2, 3, 4, 5]), 1e-3))
+	if (!NumJS.EQ_ABS(X, NumJS.MAT(5, 1, [1, 2, 3, 4, 5]), 1e-3))
 		throw "Invalid result for solve(A, Y).";
 
 	var det = A.PLU().det();
@@ -26,7 +26,7 @@ function test_MatLU_004()
 	if (!NumJS.EQ_ABS(det, -6370, 100))
 		throw "Invalid result for det(A).";
 
-	var B = NumJS.CM(3, 3, [
+	var B = NumJS.MAT(3, 3, [
 		NumJS.C(2, 6), NumJS.C(1, 2), NumJS.C( 8, 2),
 		NumJS.C(8, 1), NumJS.C(2, 3), NumJS.C(10, 4),
 		NumJS.C(5, 7), NumJS.C(7, 9), NumJS.C( 5, 5)

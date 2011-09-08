@@ -9,12 +9,11 @@ var uniOps = [ "INV", "NEG", "ABS", "NORM", "ARG", "CONJ", "TRANSP",
 
 var exampleFloat = 1;
 var exampleCmplx = NumJS.C(1, 1);
-var exampleRMatrix = new NumJS.RMatrix(1, 1, [ exampleFloat ]);
-var exampleCMatrix = new NumJS.CMatrix(1, 1, [ exampleCmplx ]);
+var exampleMatrix = new NumJS.Matrix(1, 1, [ 1 ]);
 var examplePMatrix = new NumJS.PMatrix(1);
 
-var operandNames = [ "Real", "Cmplx", "RMatrix", "CMatrix", "PMatrix" ];
-var operandExamples = [ exampleFloat, exampleCmplx, exampleRMatrix, exampleCMatrix, examplePMatrix ];
+var operandNames = [ "Real", "Cmplx", "Matrix", "PMatrix" ];
+var operandExamples = [ exampleFloat, exampleCmplx, exampleMatrix, examplePMatrix ];
 
 for (i in binOps)
 {

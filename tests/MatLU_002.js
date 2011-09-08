@@ -1,7 +1,7 @@
 
 function test_MatLU_002()
 {
-	var A = NumJS.RM(4, 4);
+	var A = NumJS.MAT(4, 4);
 
 	for (var i = 0; i < 4; i++)
 	for (var j = 0; j < 4; j++)

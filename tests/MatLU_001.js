@@ -1,8 +1,8 @@
 
 function test_MatLU_001()
 {
-	var L = NumJS.RM(4, 4);
-	var U = NumJS.RM(4, 4);
+	var L = NumJS.MAT(4, 4);
+	var U = NumJS.MAT(4, 4);
 
 	for (var i = 0; i < 4; i++)
 	for (var j = 0; j < 4; j++) {

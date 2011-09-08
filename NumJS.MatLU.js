@@ -40,13 +40,8 @@ NumJS.GenericMatrix.prototype.LU = function()
 	var n = this.rows;
 
 	// in this LU solver P is just the identity
-	P = NumJS.PM(n);
-
-	if (this instanceof NumJS.CMatrix)
-		L = NumJS.CM(n, n);
-	else
-		L = NumJS.RM(n, n);
-
+	P = NumJS.PMAT(n);
+	L = NumJS.MAT(n, n);
 	A = this.copy();
 	U = this.copy();
 
@@ -80,13 +75,8 @@ NumJS.GenericMatrix.prototype.PLU = function()
 	var A, P, L, U;
 	var n = this.rows;
 
-	P = NumJS.PM(n);
-
-	if (this instanceof NumJS.CMatrix)
-		L = NumJS.CM(n, n);
-	else
-		L = NumJS.RM(n, n);
-
+	P = NumJS.PMAT(n);
+	L = NumJS.MAT(n, n);
 	A = this.copy();
 	U = this.copy();
 
@@ -157,11 +147,7 @@ NumJS.GenericPLU.prototype.solve = function(Y)
 	if (n != Y.rows)
 		throw "NumJS.MatLU dimension mismatch";
 
-	var X;
-	if (Y instanceof NumJS.CMatrix || this.U instanceof NumJS.CMatrix)
-		X = NumJS.CM(n, Y.cols);
-	else
-		X = NumJS.RM(n, Y.cols);
+	var X = NumJS.MAT(n, Y.cols);
 
 	for (var k = 0; k < Y.cols; k++)
 	{

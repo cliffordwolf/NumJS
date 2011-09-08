@@ -2,8 +2,8 @@
 function test_MatLU_003()
 {
 	var n = 10;
-	var A = NumJS.CM(n, n);
-	var Y = NumJS.CM(n, 2*n);
+	var A = NumJS.MAT(n, n);
+	var Y = NumJS.MAT(n, 2*n);
 
 	printf("Solving complex {1}x{1} system for {2} right hand side vectors.\n", n, n*2);
 
