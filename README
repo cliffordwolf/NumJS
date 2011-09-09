@@ -147,6 +147,7 @@ The parser accepts the following constructs in expressions:
 
 	- number literals and variable names
 	- imagenary literals (a number followed by 'i')
+	- matrices using [ a, b, c; d, e, f ] notation
 	- ( .. ) blocks and function calls
 	- prefix '+' (ignored) and '-' (NumJS.NEG)
 	- infix '*' (NumJS.MUL)

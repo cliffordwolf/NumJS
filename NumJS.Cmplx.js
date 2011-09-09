@@ -55,7 +55,7 @@ NumJS.Cmplx.prototype =
 		if ((a instanceof NumJS.Cmplx) && (typeof(b) == "number"))
 			return NumJS.C(a.re - b, a.im);
 		if ((typeof(a) == "number") && (b instanceof NumJS.Cmplx))
-			return NumJS.C(a - b.re, b.im);
+			return NumJS.C(a - b.re, -b.im);
 		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_sub) == "function"))
 			return b.op_sub(a, b);
 		throw "NumJS.Cmplx type error";

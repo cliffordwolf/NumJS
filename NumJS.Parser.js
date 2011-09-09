@@ -32,6 +32,23 @@ NumJS.Parse = function(text, args, defs)
 			code += "var " + i + " = " + defs[i] + ";\n";
 	}
 
+	// lexical pass: used to identify literals and extract 'non-trivial'
+	// literals. I.e. literals that contain '+' and '-' such as "1.23e-5"
+	// that would confuse the actual parser.
+	var tokens = text.match(/(\.?[0-9][0-9.]*e[+-]?[0-9]+i?|[a-zA-Z_0-9.]+|.)/g);
+	text = "";
+	for (var i in tokens) {
+		if (tokens[i].search(/^\.?[0-9][0-9.]*e[+-]?[0-9]+i?$/) >= 0) {
+			text += "$" + idx;
+			code += "var $" + (idx++) + " = ";
+			if (tokens[i].search(/(.*)i$/) >= 0)
+				code += "NumJS.C(0, " + RegExp.$1 + ");\n";
+			else
+				code += tokens[i] + ";\n";
+		} else
+			text += tokens[i];
+	}
+
 	// this function reduces a textual expression to
 	// a single variable index and returns the corrspondig
 	// basic "$n" expression, writing the actual js code
@@ -93,6 +110,71 @@ NumJS.Parse = function(text, args, defs)
 				}
 
 				text = prefix + reduce(inner) + postfix;
+				continue;
+			}
+
+			// matrix notation
+			pos = text.search(/\[/);
+			if (pos >= 0)
+			{
+				var prefix = text.slice(0, pos);
+				var postfix = text.slice(pos + 1);
+
+				var i, pcount = 1;
+				for (i = 0; pcount > 0; i++) {
+					if (i >= postfix.length)
+						throw "NumJS.Parse parser error.";
+					var ch = postfix.substr(i, 1);
+					if (ch == "[")
+						pcount++;
+					if (ch == "]")
+						pcount--;
+				}
+				var inner = postfix.slice(0, i-1);
+				postfix = postfix.slice(i);
+
+				var start = 0;
+				var cellData = new Object();
+				var rowNum = 0, colNum = 0;
+				var rowId = 0, colId = 0;
+				function addCell(txt, term) {
+					if (rowId >= rowNum)
+						rowNum = rowId + 1;
+					if (colId >= colNum)
+						colNum = colId + 1;
+					cellData[rowId + " " + colId] = reduce(txt);
+					if (term == ",")
+						colId++;
+					if (term == ";")
+						rowId++, colId = 0;
+				}
+				for (i = 0; i < inner.length; i++) {
+					var ch = inner.substr(i, 1);
+					if (ch == "[")
+						pcount++;
+					if (ch == "]")
+						pcount--;
+					if ((ch == "," || ch == ";") && pcount == 0) {
+						addCell(inner.slice(start, i), ch);
+						start = i + 1;
+					}
+				}
+				if (start != i)
+					addCell(inner.slice(start, i), ch);
+
+				code += "var $" + idx + " = NumJS.MAT(" + rowNum + ", " + colNum + ", [";
+				for (var i = 0; i < rowNum; i++)
+				for (var j = 0; j < colNum; j++) {
+					if (i != 0 || j != 0)
+						code += ", ";
+					if ((i + " " + j) in cellData)
+						code +=  cellData[i + " " + j];
+					else
+						code += "0";
+				}
+				code += " ]);\n";
+
+				text = prefix + "$" + (idx++) + postfix;
 				continue;
 			}
 
