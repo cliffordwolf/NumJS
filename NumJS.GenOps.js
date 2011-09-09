@@ -225,7 +225,7 @@ NumJS.EQ_REL = function(a, b, d) {
 	if (typeof(b.op_eq) == "function")
 		return b.op_eq_rel(a, b, d);
 	if (typeof(a) == "number" && typeof(b) == "number")
-		return Math.abs(a - b) <= d * Math.min(Math.abs(a), Math.abs(b));
+		return Math.abs(a - b) <= d * (Math.abs(a) + Math.abs(b)) * 0.5;
 	throw "NumJS.GenOps type error";
 };
 
