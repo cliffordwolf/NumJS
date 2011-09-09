@@ -1,7 +1,13 @@
 <script type="text/javascript" src="../../NumJS.js"></script>
 <script type="text/javascript">NumJS.loader_html("../../")</script>
 
-<textarea id="console" rows="24" cols="100" readonly="1"></textarea></br>
+<!-- duble buffering for textarea: this is a hack! some browsers reset the scrollbar to the top position whenever
+writing to a textarea .value property. Even when whe reset the scrollbar position afterward this results in some
+ungly flicker. so we do double buffering using "con1" and "con2". The always invisible "con0" is just a spacer
+for positioning the input field correcly. -->
+<textarea id="con1" rows="24" cols="100" readonly="1" style="visibility: visible; position: absolute;"></textarea>
+<textarea id="con2" rows="24" cols="100" readonly="1" style="visibility: hidden; position: absolute;"></textarea>
+<textarea id="con0" rows="24" cols="100" readonly="1" style="visibility: hidden"></textarea></br>
 <b>&gt;</b><input id="prompt" size="80" onkeyup="handleKey(event.keyCode)"/>
 
 <script><!--
@@ -30,11 +36,22 @@ var defs = {
 	round: "NumJS.ROUND",
 };
 
+var conText = "";
+var conActive = 1;
+
+var welcomeMsg = "Type `example' to execute example session or `help' for command overview.";
+
 function consoleOut(text)
 {
-	var con = document.getElementById("console");
-	con.value += text;
-	con.scrollTop = document.getElementById("console").scrollHeight;
+	var conOff = document.getElementById("con" + conActive);
+	conActive = conActive == 1 ? 2 : 1;
+	var conOn = document.getElementById("con" + conActive);
+
+	conText += text;
+	conOn.value = conText;
+	conOn.scrollTop = conOn.scrollHeight;
+	conOn.style.visibility = "visible";
+	conOff.style.visibility = "hidden";
 }
 
 function exec(code)
@@ -64,7 +81,8 @@ function exec(code)
 		text += "     var: expr   ................. define variable\n";
 		text += "     func(args): expr   .......... define function\n";
 		text += "     debug expr   ................ show javascript for expression\n";
-		text += "     prec N   .................... set precision to N decimal digits\n\n";
+		text += "     prec N   .................... set precision to N decimal digits\n";
+		text += "     clear ....................... clear screen\n\n";
 		text += "     Builtin functions: dot pow inv abs norm arg conj\n";
 		text += "                        transp exp log det re im round\n\n";
 		text += "     Operators: ( ) * / \\ + -";
@@ -86,6 +104,11 @@ function exec(code)
 		if (fixN == 0)
 			return "*full precision*";
 		return (0).toFixed(fixN);
+	}
+
+	if (code.search(/^clear *$/) == 0) {
+		conText = "";
+		return welcomeMsg;;
 	}
 
 	if (code.search(/^([A-Za-z][A-Za-z_0-9]*) *:(.*)/) == 0) {
@@ -140,9 +163,7 @@ function handleKey(keyCode)
 	}
 }
 
-document.getElementById("console").value = "";
-consoleOut("Type `example' to execute example session or `help' for command overview.\n\n");
-
+consoleOut(welcomeMsg + "\n\n");
 document.getElementById("prompt").value = "";
 document.getElementById("prompt").focus();
 
