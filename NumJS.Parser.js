@@ -20,7 +20,7 @@
  *
  */
 
-"use strict";
+// "use strict";
 
 NumJS.Parse = function(text, args, defs)
 {
