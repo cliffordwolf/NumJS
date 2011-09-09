@@ -1,0 +1,149 @@
+<script type="text/javascript" src="../../NumJS.js"></script>
+<script type="text/javascript">NumJS.loader_html("../../")</script>
+
+<textarea id="console" rows="24" cols="100" readonly="1"></textarea></br>
+<b>&gt;</b><input id="prompt" size="80" onkeyup="handleKey(event.keyCode)"/>
+
+<script><!--
+
+var fixN = 0;
+
+var hist = new Array();
+var hidx = 0;
+
+var env = {
+};
+var defs = {
+	dot: "NumJS.DOT",
+	pow: "NumJS.POW",
+	inv: "NumJS.INV",
+	abs: "NumJS.ABS",
+	norm: "NumJS.NORM",
+	arg: "NumJS.ARG",
+	conj: "NumJS.CONJ",
+	transp: "NumJS.TRANSP",
+	exp: "NumJS.EXP",
+	log: "NumJS.LOG",
+	det: "NumJS.DET",
+	re: "NumJS.RE",
+	im: "NumJS.IM",
+	round: "NumJS.ROUND",
+};
+
+function consoleOut(text)
+{
+	var con = document.getElementById("console");
+	con.value += text;
+	con.scrollTop = document.getElementById("console").scrollHeight;
+}
+
+function exec(code)
+{
+	code = code.replace(/^ */, "");
+
+	if (code.search(/^debug (.*)/) == 0) {
+		return NumJS.Parse(RegExp.$1, "", defs);
+	}
+
+	if (code.search(/^example *$/) == 0) {
+		consoleOut("\n");
+		handleExec("prec 2");
+		handleExec("A: [ 1, 2, 3; 4i, 5, 6i; -7, 9+9i, 0 ]");
+		handleExec("y: [ 10; 20; 30 ]");
+		handleExec("x: A \\ y");
+		handleExec("A * x");
+		return "END OF EXAMPLE";
+	}
+
+	if (code.search(/^help *$/) == 0) {
+		var text = "\n";
+		text += "     example ..................... execute example session\n";
+		text += "     help ........................ this help message\n";
+		text += "     list ........................ list variables and functions\n";
+		text += "     expr   ...................... execute expression\n";
+		text += "     var: expr   ................. define variable\n";
+		text += "     func(args): expr   .......... define function\n";
+		text += "     debug expr   ................ show javascript for expression\n";
+		text += "     prec N   .................... set precision to N decimal digits\n\n";
+		text += "     Builtin functions: dot pow inv abs norm arg conj\n";
+		text += "                        transp exp log det re im round\n\n";
+		text += "     Operators: ( ) * / \\ + -";
+		return text;
+	}
+
+	if (code.search(/^list *$/) == 0) {
+		var text = "";
+		for (i in env) {
+			text += "  " + i;
+		}
+		if (text == "")
+			text = "*empty*";
+		return text;
+	}
+
+	if (code.search(/^prec ([0-9]+) *$/) == 0) {
+		fixN = +RegExp.$1;
+		if (fixN == 0)
+			return "*full precision*";
+		return (0).toFixed(fixN);
+	}
+
+	if (code.search(/^([A-Za-z][A-Za-z_0-9]*) *:(.*)/) == 0) {
+		var name = RegExp.$1;
+		var value = (eval(NumJS.Parse(RegExp.$2, "", defs)))();
+		env[name] = value;
+		defs[name] = "env." + name;
+		return fixN > 0 ? value.toFixed(3) : value;
+	}
+
+	if (code.search(/^([A-Za-z][A-Za-z_0-9]*) *\(([^()]*)\):(.*)/) == 0) {
+		var name = RegExp.$1;
+		var value = eval(NumJS.Parse(RegExp.$3, RegExp.$2, defs));
+		env[name] = value;
+		defs[name] = "env." + name;
+		return "defined.";
+	}
+
+	var value = (eval(NumJS.Parse(code, "", defs)))();
+	return fixN > 0 ? value.toFixed(fixN) : value;
+}
+
+function handleExec(code)
+{
+	consoleOut("> " + code + "\n");
+	hist.push(code);
+	hidx = hist.length;
+
+	try {
+		var result = exec(code);
+		consoleOut(result + "\n\n");
+	} catch (err) {
+		consoleOut(err + "\n\n");
+	}
+}
+
+function handleKey(keyCode)
+{
+	if (keyCode == 13) {
+		var code = document.getElementById("prompt").value;
+		document.getElementById("prompt").value = "";
+		handleExec(code);
+	}
+	if (keyCode == 38 && hidx > 0) {
+		document.getElementById("prompt").value = hist[--hidx];
+	}
+	if (keyCode == 40 && hidx < hist.length) {
+		if (++hidx == hist.length)
+			document.getElementById("prompt").value = "";
+		else
+			document.getElementById("prompt").value = hist[hidx];
+	}
+}
+
+document.getElementById("console").value = "";
+consoleOut("Type `example' to execute example session or `help' for command overview.\n\n");
+
+document.getElementById("prompt").value = "";
+document.getElementById("prompt").focus();
+
+//--></script>
