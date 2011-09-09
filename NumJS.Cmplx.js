@@ -89,7 +89,7 @@ NumJS.Cmplx.prototype =
 		if ((a instanceof NumJS.Cmplx) && (typeof(b) == "number"))
 			return NumJS.C(a.re / b, a.im / b);
 		if ((typeof(a) == "number") && (b instanceof NumJS.Cmplx))
-			return NumJS.C(a / (b.re*b.re + b.im*b.im), (-a*b.im) / (b.re*b.re + b.im*b.im));
+			return NumJS.C((a*b.re) / (b.re*b.re + b.im*b.im), (-a*b.im) / (b.re*b.re + b.im*b.im));
 		if (!(b instanceof NumJS.Cmplx) && (typeof(b.op_div) == "function"))
 			return b.op_div(a, b);
 		throw "NumJS.Cmplx type error";

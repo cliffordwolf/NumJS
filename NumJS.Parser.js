@@ -22,10 +22,15 @@
 
 "use strict";
 
-NumJS.Parse = function(argNames, text)
+NumJS.Parse = function(text, args, defs)
 {
-	var code = "function(" + argNames + "){\n";
+	var code = "(function(" + (typeof(args) != "undefined" ? args : "") + "){\n";
 	var idx = 0;
+
+	if (typeof(defs) != "undefined") {
+		for (i in defs)
+			code += "var " + i + " = " + defs[i] + ";\n";
+	}
 
 	// this function reduces a textual expression to
 	// a single variable index and returns the corrspondig
@@ -34,24 +39,15 @@ NumJS.Parse = function(argNames, text)
 	function reduce(text)
 	{
 		var pos;
-
-		function consumeToken() {
-			if (!text.match(/^(\$[a-zA-Z_0-9]+|.)/))
-				throw "NumJS.Parse parser error.";
-			var token = RegExp.$1;
-			text = text.replace(/^(\$[a-zA-Z_0-9]+|.)/, "");
-			return token;
-		}
-
 		while (1)
 		{
 			// blocks and function calls
-			pos = text.search(/[a-zA-Z_0-9]*\(/);
+			pos = text.search(/[a-zA-Z_0-9.]*\(/);
 			if (pos >= 0)
 			{
 				var prefix = text.slice(0, pos);
 				var postfix = text.slice(pos);
-				var funcname = postfix.match(/^[a-zA-Z_0-9]*/)[0];
+				var funcname = postfix.match(/^[a-zA-Z_0-9.]*/)[0];
 				postfix = postfix.slice(funcname.length + 1);
 
 				var i, pcount = 1;
@@ -67,15 +63,64 @@ NumJS.Parse = function(argNames, text)
 				var inner = postfix.slice(0, i-1);
 				postfix = postfix.slice(i);
 
+				// handle a function call
 				if (funcname != "")
-					throw "NumJS.Parse functions TBD.";
+				{
+					var fcall = funcname + "(";
+					var start = 0;
+					for (i = 0; i < inner.length; i++) {
+						var ch = inner.substr(i, 1);
+						if (ch == "(")
+							pcount++;
+						if (ch == ")")
+							pcount--;
+						if (ch == "," && pcount == 0) {
+							var arg = inner.slice(start, i);
+							if (start != 0)
+								fcall += ", ";
+							fcall += reduce(arg);
+							start = i + 1;
+						}
+					}
+					var arg = inner.slice(start, i);
+					if (start != 0)
+						fcall += ", ";
+					fcall += reduce(arg) + ");\n";
+
+					text = prefix + "$" + idx + postfix;
+					code += "var $" + (idx++) + " = " + fcall;
+					continue;
+				}
 
 				text = prefix + reduce(inner) + postfix;
 				continue;
 			}
 
+			// prefix '+' and '-'
+			pos = text.search(/(^|[^$a-zA-Z_0-9.])(\+|-)([$a-zA-Z_0-9.]+)/);
+			if (pos >= 0)
+			{
+				pos += RegExp.$1.length;
+				var prefix = text.slice(0, pos);
+				var op = RegExp.$2
+				pos += op.length;
+				var val = RegExp.$3
+				pos += val.length;
+				var postfix = text.slice(pos);
+
+				val = reduce(val);
+
+				text = prefix + "$" + idx + postfix;
+				code += "var $" + (idx++) + " = ";
+				if (op == "+")
+					code += val + ";\n";
+				if (op == "-")
+					code += "NumJS.NEG(" + val + ");\n";
+				continue;
+			}
+
 			// multiply and divide
-			pos = text.search(/([$a-zA-Z_0-9]+)(\*|\.|\/|\\)([$a-zA-Z_0-9]+)/);
+			pos = text.search(/([$a-zA-Z_0-9.]+)(\*|\/|\\)([$a-zA-Z_0-9.]+)/);
 			if (pos >= 0)
 			{
 				var prefix = text.slice(0, pos);
@@ -86,6 +131,9 @@ NumJS.Parse = function(argNames, text)
 				var val2 = RegExp.$3
 				pos += val2.length;
 				var postfix = text.slice(pos);
+
+				val1 = reduce(val1);
+				val2 = reduce(val2);
 
 				text = prefix + "$" + idx + postfix;
 				code += "var $" + (idx++) + " = ";
@@ -102,7 +150,7 @@ NumJS.Parse = function(argNames, text)
 			}
 
 			// add and subtract
-			pos = text.search(/([$a-zA-Z_0-9]+)(\+|-)([$a-zA-Z_0-9]+)/);
+			pos = text.search(/([$a-zA-Z_0-9.]+)(\+|-)([$a-zA-Z_0-9.]+)/);
 			if (pos >= 0)
 			{
 				var prefix = text.slice(0, pos);
@@ -114,6 +162,9 @@ NumJS.Parse = function(argNames, text)
 				pos += val2.length;
 				var postfix = text.slice(pos);
 
+				val1 = reduce(val1);
+				val2 = reduce(val2);
+
 				text = prefix + "$" + idx + postfix;
 				code += "var $" + (idx++) + " = ";
 				if (op == "+")
@@ -124,8 +175,15 @@ NumJS.Parse = function(argNames, text)
 				continue;
 			}
 
+			// handle imaginary literals
+			pos = text.search(/^([0-9][0-9.]*)i$/);
+			if (pos >= 0) {
+				code += "var $" + idx + " = NumJS.C(0, " + RegExp.$1 + ");\n";
+				return "$" + (idx++);
+			}
+
 			// we are done
-			pos = text.search(/^[$a-zA-Z_0-9]+$/);
+			pos = text.search(/^[$a-zA-Z_0-9.]+$/);
 			if (pos >= 0)
 				return text;
 
@@ -136,7 +194,7 @@ NumJS.Parse = function(argNames, text)
 	text = text.replace(new RegExp("[ \t\r\n]", "g"), "");
 
 	var result = reduce(text);
-	code += "return " + result + ";\n}\n";
+	code += "return " + result + ";\n})";
 
 	return code;
 };

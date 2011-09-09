@@ -111,6 +111,54 @@ also have .toFixed() and a .toPrecision() methods that are compatible with
 the generic JavaScript .toFixed() and .toPrecision() number methods.
 
 
+Expression Parser
+-----------------
+
+It can be hard to write complex expressions using the NumJS.* operator functions.
+So NumJS comes with en expression parser for infix expressions that can be used
+to automatically create functions that use the NumJS.* operators from string
+expressions:
+
+        var func = eval(NumJS.Parse(
+			"a + b * -(c / pow(-2i, a)) + b",
+			"a, b, c", { pow: "NumJS.POW" }));
+	var result = func(1, 2, 3);
+
+The 1st argument to NumJS.Parse() is the expression to generate a function for.
+The 2nd argument to NumJS.Parse() is the argument list for the generated function
+and the 3rd argument is a hash with all local defines (like short forms for
+function calls) to be included in the generated function. The JavaScript code
+that is returned by NumJS.Parse() looks like this:
+
+	(function(a, b, c){
+		var pow = NumJS.POW;
+		var $0 = NumJS.C(0, 2);
+		var $1 = NumJS.NEG($0);
+		var $2 = pow($1, a);
+		var $3 = NumJS.DIV(c, $2);
+		var $4 = NumJS.NEG($3);
+		var $5 = NumJS.MUL(b, $4);
+		var $6 = NumJS.ADD(a, $5);
+		var $7 = NumJS.ADD($6, b);
+		return $7;
+	})
+
+The parser accepts the following constructs in expressions:
+
+	- number literals and variable names
+	- imagenary literals (a number followed by 'i')
+	- ( .. ) blocks and function calls
+	- prefix '+' (ignored) and '-' (NumJS.NEG)
+	- infix '*' (NumJS.MUL)
+	- infix '/' (NumJS.DIV)
+	- infix '\' (NumJS.SOLVE)
+	- infix '+' (NumJS.ADD)
+	- infix '-' (NumJS.SUB)
+
+It is generally recommended to parse and evaluate an expression only once and
+then reuse the resulting function handler for subsequent calculations.
+
+
 Matrices
 --------
 
@@ -119,17 +167,15 @@ Matrices can be created using one of the following two functions:
 	var matrix3x3 = NumJS.MAT(3, 3);
 	var permut3x3 = NumJS.PMAT(3);
 
-Real and complex matrices are initialized to all-zeros and can be filled
-using the .set(row, col, value) method. Note that row and column indexes
-start with 0.
+Normal matrices are initialized to all-zeros and can be filled using the
+.set(row, col, value) method. Note that row and column indexes start with 0.
 
 Permutation Matrices are initialized to the identity matrix and can be
 modified using the .pivot_col(c1, c2) and .pivot_row(r1, r2) methods,
 that pivot the two specified rows or columns.
 
-Alternatively real and complex matrices can be initialized using their
-constructors by passing and additional array with the initialization
-data in row-major order:
+Alternatively matrices can be initialized using their constructors by passing
+and additional array with the initialization data in row-major order:
 
 	var matrixFlip3x3 = NumJS.MAT(3, 3, [
 		0, 0, 1,
@@ -162,7 +208,7 @@ Note that also permutation matrices provide a .get(row, col) method, but
 lack support of a .set(row, col, value) method.
 
 A copy of a matrix can be created using the .copy() method. This method
-converts permutation matrices into real matrices. If this is not the desired
+converts permutation matrices into normal matrices. If this is not the desired
 behavior, use the .clone() method instead.
 
 A row-major array of matrix block can be generated using the Matrix
@@ -202,8 +248,8 @@ performs factorization with pivoting. In most cases factorization with
 pivoting is prefered over factorization without pivoting.
 
 The PLU object stores the factorization in the properties .P, .L and .U
-with .P beeing a permutation matrix object and .L and .U beeing real
-matrices if the factorized matrix was real and complex matrices otherwise.
+with .P beeing a permutation matrix object and .L and .U beeing normal
+matrices.
 
 Per definition .L is a lower triangular matrix with all ones on the main
 diagonal and .U is an upper triangular matrix.
