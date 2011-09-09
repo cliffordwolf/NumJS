@@ -84,28 +84,30 @@ NumJS.Parse = function(text, args, defs)
 				if (funcname != "")
 				{
 					var fcall = funcname + "(";
-					var start = 0;
-					for (i = 0; i < inner.length; i++) {
-						var ch = inner.substr(i, 1);
-						if (ch == "(")
-							pcount++;
-						if (ch == ")")
-							pcount--;
-						if (ch == "," && pcount == 0) {
-							var arg = inner.slice(start, i);
-							if (start != 0)
-								fcall += ", ";
-							fcall += reduce(arg);
-							start = i + 1;
+					if (inner != "") {
+						var start = 0;
+						for (i = 0; i < inner.length; i++) {
+							var ch = inner.substr(i, 1);
+							if (ch == "(")
+								pcount++;
+							if (ch == ")")
+								pcount--;
+							if (ch == "," && pcount == 0) {
+								var arg = inner.slice(start, i);
+								if (start != 0)
+									fcall += ", ";
+								fcall += reduce(arg);
+								start = i + 1;
+							}
 						}
+						var arg = inner.slice(start, i);
+						if (start != 0)
+							fcall += ", ";
+						fcall += reduce(arg);
 					}
-					var arg = inner.slice(start, i);
-					if (start != 0)
-						fcall += ", ";
-					fcall += reduce(arg) + ");\n";
 
 					text = prefix + "$" + idx + postfix;
-					code += "var $" + (idx++) + " = " + fcall;
+					code += "var $" + (idx++) + " = " + fcall + ");\n";
 					continue;
 				}
 
