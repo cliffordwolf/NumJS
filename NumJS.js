@@ -35,7 +35,7 @@ NumJS.loader_html = function(prefix)
 {
 	for (var i in NumJS.modules) {
 		var src = prefix + 'NumJS.' + NumJS.modules[i] + '.js';
-		document.write('<script type="text/javascript" src="' + src + '"></script>\n');
+		document.body.appendChild(document.createElement('script')).src = src;
 	}
 };
 
