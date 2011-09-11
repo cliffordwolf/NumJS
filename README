@@ -48,7 +48,7 @@ errors in the calculation you want to perform before you implement it.
 This is of course true for all numerical computing environments, but with
 single precision floating point values you e.g. see problems in solving 10x10
 linear systems that you usually wouldn't see in 100x100 systems when performing
-the same calculations using  double precision floats.
+the same calculations using double precision floats.
 
 You have been warned. Happy Hacking.
 
@@ -171,7 +171,7 @@ Matrices can be created using one of the following two functions:
 Normal matrices are initialized to all-zeros and can be filled using the
 .set(row, col, value) method. Note that row and column indexes start with 0.
 
-Permutation Matrices are initialized to the identity matrix and can be
+Permutation matrices are initialized to the identity matrix and can be
 modified using the .pivot_col(c1, c2) and .pivot_row(r1, r2) methods,
 that pivot the two specified rows or columns.
 
@@ -192,7 +192,7 @@ case the array must contain the row-number of each '1' per column:
 There is no special vector class. So vectors must simply be created as
 Nx1 matrices.
 
-Matrix-Matrix and Matrix-Scalar operations can be performed using the
+Matrix-matrix and matrix-scalar operations can be performed using the
 uppercase NumJS.* metioned above and work as one would expect it. E.g.:
 
 	var A = NumJS.MAT(2, 2, [1, 2, 3, 4]);
@@ -212,9 +212,9 @@ A copy of a matrix can be created using the .copy() method. This method
 converts permutation matrices into normal matrices. If this is not the desired
 behavior, use the .clone() method instead.
 
-A row-major array of matrix block can be generated using the Matrix
-.cut(row, col, nRows, nCols) method. A block of a Matrix can be written
-using the Matrix .paste(row, col, nRows, nCols) mehthod. The methods
+A row-major array of matrix block can be generated using the matrix
+.cut(row, col, nRows, nCols) method. A block of a matrix can be written
+using the matrix .paste(row, col, nRows, nCols) mehthod. The methods
 .cut_cm() and .paste_cm() do the same for column-major arrays. This
 functions can be used to easily rearange matrices or initialize them
 row- or column-wise:
@@ -224,7 +224,7 @@ row- or column-wise:
 	A.paste(1, 0, 1, 3, [ 4, 5, 6 ]);
 	A.paste(2, 0, 1, 3, [ 7, 8, 9 ]);
 
-The dimension of a Matrix is stored in its .rows and .cols properties.
+The dimension of a matrix is stored in its .rows and .cols properties.
 A permutation matrix has an additional .sign property that holds the
 sign of the permutation.
 
@@ -234,12 +234,25 @@ also have .toFixed() and a .toPrecision() methods that are compatible with
 the generic JavaScript .toFixed() and .toPrecision() number methods.
 
 
+Reduced row echelon form of a matrix and matrix rank
+----------------------------------------------------
+
+Each matrix object provides the method .rref() that calculates the
+reduced row echelon form of the matrix. The matrix object returned
+by .rref() has an additional property .pivcols that is an array with
+the indices of all pivot columns.
+
+The number of elements in .rref().pivcols is also the rank of the
+matrix. For convinience each matrix object also has a .rank() method
+that simply returns the value of .rref().pivcols.length.
+
+
 PA = LU factorization and solver
 --------------------------------
 
-Each Matrix object provides the functions .LU() and .PLU() that perform
+Each matrix object provides the methods .LU() and .PLU() that perform
 an LU factorization and return a PLU object when the factorization was
-successful and null if the Matrix can't be factorized.
+successful and null if the matrix can't be factorized.
 
 The result of a factorization is cached. So successive callc to .LU()
 or .PLU() do not introduce any significant performance problem.

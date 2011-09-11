@@ -21,22 +21,24 @@
 
 "use strict";
 
-var NumJS = new Object();
-
-NumJS.modules = [
-	"GenOps",
-	"Parser",
-	"Cmplx",
-	"Matrix",
-	"MatRREF",
-	"MatLU",
-];
-
-NumJS.loader_html = function(prefix)
+NumJS.GenericMatrix.prototype.rref = function()
 {
-	for (var i in NumJS.modules) {
-		var src = prefix + 'NumJS.' + NumJS.modules[i] + '.js';
-		document.body.appendChild(document.createElement('script')).src = src;
-	}
+	if ("rref" in this.cache)
+		return this.cache["rref"];
+
+	var R = this.copy();
+	var pivcols = new Array();
+
+	// TBD!
+	window.alert("Matrix.rref() isn't implemented yet!");
+
+	R.pivcols = pivcols;
+	this.cache["rref"] = R;
+	return this.cache["rref"];
+};
+
+NumJS.GenericMatrix.prototype.rank = function()
+{
+	return this.rref().pivcols.length;
 };
 
