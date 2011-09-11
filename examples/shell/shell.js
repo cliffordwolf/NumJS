@@ -1,5 +1,6 @@
 
 // Namespace NumShell
+if (!window.NumShell)
 window.NumShell = (function(){
 
 var fixN = 0;
@@ -9,10 +10,10 @@ var hidx = 0;
 
 var env = new Object();
 
-var conText = "";
-var conActive = 1;
+var welcomeMsg = "Type `example' to execute an example session or `help' for command overview.";
 
-var welcomeMsg = "Type `example' to execute example session or `help' for command overview.";
+var conText = welcomeMsg + "\n\n";
+var conActive = 1;
 
 function consoleOut(text)
 {
@@ -192,11 +193,13 @@ function handleExec(code)
 
 function handleKey(keyCode)
 {
+	// enter
 	if (keyCode == 13) {
 		var code = document.getElementById("NumShell.prompt").value;
 		document.getElementById("NumShell.prompt").value = "";
 		handleExec(code);
 	}
+	// up and down
 	if (keyCode == 38 && hidx > 0) {
 		document.getElementById("NumShell.prompt").value = hist[--hidx];
 	}
@@ -205,6 +208,15 @@ function handleKey(keyCode)
 			document.getElementById("NumShell.prompt").value = "";
 		else
 			document.getElementById("NumShell.prompt").value = hist[hidx];
+	}
+	// page up and page down
+	if (keyCode == 33) {
+		var conOn = document.getElementById("NumShell.con" + conActive);
+		conOn.scrollTop = conOn.scrollTop - 100;
+	}
+	if (keyCode == 34) {
+		var conOn = document.getElementById("NumShell.con" + conActive);
+		conOn.scrollTop = conOn.scrollTop + 100;
 	}
 }
 
@@ -248,29 +260,37 @@ function generateWindow(baseuri)
 	var win = document.body.appendChild(document.createElement('div'));
 	win.setAttribute("id", "NumShell.win");
 	win.setAttribute("onmousedown", "NumShell.mouse(event)");
-	win.setAttribute("onmousemove", "NumShell.mouse(event)");
-	win.setAttribute("onmouseout", "NumShell.mouse(event)");
-	win.setAttribute("onmouseup", "NumShell.mouse(event)");
-	win.style.backgroundColor = "#6f6";
+	win.style.backgroundColor = "#488";
 	win.style.position = "absolute";
-	win.style.top = window.scrollY + "100px";
-	win.style.left = window.scrollX + "100px";
-	win.style.padding = "0.5em";
+	win.style.top = (window.scrollY + 100) + "px";
+	win.style.left = (window.scrollX + 100) + "px";
+	win.style.padding = "5px";
 	win.style.border = "5px solid #000";
-	win.appendChild(document.createElement('b')).
+	win.style.zIndex = 1000;
+	var title = win.appendChild(document.createElement('div'));
+	title.appendChild(document.createElement('b')).
 			appendChild(document.createTextNode("NumShell - A NumJS Example App"));
-	win.appendChild(document.createElement('br'));
+	title.style.backgroundColor = "#aff";
+	title.style.padding = "5px";
+
+	if (!window.NumShellRegisteredWindowEvents) {
+		window.addEventListener('mousemove', NumShell.mouse, false);
+		window.addEventListener('mouseup', NumShell.mouse, false);
+		window.NumShellRegisteredWindowEvents = 1;
+	}
 
 	var ids = [ "con1", "con2", "con0" ];
 	for (i in ids) {
 		var node = win.appendChild(document.createElement('textarea'));
 		node.setAttribute("id", "NumShell." + ids[i]);
-		node.setAttribute("rows", "24");
-		node.setAttribute("cols", "100");
+		node.setAttribute("rows", "20");
+		node.setAttribute("cols", "80");
 		node.setAttribute("readonly", "100");
 		if (ids[i] != "con0")
 			node.style.position = "absolute";
 		node.style.visibility = "hidden";
+		node.style.fontFamily = "Courier";
+		node.style.fontSize = "12px";
 	}
 
 	win.appendChild(document.createElement('br'));
@@ -279,6 +299,9 @@ function generateWindow(baseuri)
 	prompt.setAttribute("id", "NumShell.prompt");
 	prompt.setAttribute("size", "80");
 	prompt.setAttribute("onkeyup", "NumShell.handleKey(event.keyCode)");
+	prompt.style.cssFloat = "right";
+	prompt.style.fontFamily = "Courier";
+	prompt.style.fontSize = "12px";
 
 	run();
 }
@@ -299,20 +322,20 @@ function mouse(ev)
 
 	if (ev.type == "mousemove" && lastMouseDown == 1) {
 		var win = document.getElementById("NumShell.win");
-		var relX = ev.clientX - lastMouseX;
-		var relY = ev.clientY - lastMouseY;
+		var relX = ev.pageX - lastMouseX;
+		var relY = ev.pageY - lastMouseY;
 
 		win.style.top = +win.style.top.replace(/px/,"") + relY + "px";
 		win.style.left = +win.style.left.replace(/px/,"") + relX + "px";
 	}
 
-	lastMouseX = ev.clientX;
-	lastMouseY = ev.clientY;
+	lastMouseX = ev.pageX;
+	lastMouseY = ev.pageY;
 }
 
 function run()
 {
-	consoleOut(welcomeMsg + "\n\n");
+	consoleOut("");
 	document.getElementById("NumShell.prompt").value = "";
 	document.getElementById("NumShell.prompt").focus();
 }
