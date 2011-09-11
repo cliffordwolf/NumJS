@@ -34,18 +34,23 @@ NumJS.modules = [
 
 NumJS.loader_html = function(prefix)
 {
+	for (var idx in NumJS.modules)
+		document.write('<script src="' + prefix + 'NumJS.' +
+				NumJS.modules[idx] + '.js"></script>');
+};
+
+NumJS.loader_dom = function(prefix, callback)
+{
 	var idx = 0;
 
 	function loadHead() {
 		if (idx >= NumJS.modules.length) {
-			if (console)
-				console.log("NumJS initialized.");
+			if (typeof(callback) == "function")
+				callback();
 			return;
 		}
 		var src = prefix + 'NumJS.' + NumJS.modules[idx++] + '.js';
 		var element = document.createElement('script');
-		if (console)
-			console.log("NumJS loading `" + src + "'.");
 		element.setAttribute('src', src);
 		element.addEventListener('load', loadHead, false);
 		document.body.appendChild(element);

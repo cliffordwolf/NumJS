@@ -248,7 +248,7 @@ function generateWindow(baseuri)
 		var el = document.createElement('script');
 		el.setAttribute('src', baseuri + '../../NumJS.js');
 		el.addEventListener('load', function(){
-				NumJS.loader_html(baseuri + '../../'); NumShell.run(); }, false);
+				NumJS.loader_dom(baseuri + '../../', NumShell.run); }, false);
 		document.body.appendChild(el);
 	}
 
