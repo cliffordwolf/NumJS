@@ -148,7 +148,7 @@ function exec(code)
 
 	if (code.search(/^show (.*)/) == 0) {
 		var value = (myEval(NumJS.Parse(RegExp.$1)))();
-		if ("rows" in value && "cols" in value) {
+		if (typeof(value) == "object" && "rows" in value && "cols" in value) {
 			var text = "";
 			var cellData = new Object();
 			var maxlen = 0;
@@ -226,26 +226,30 @@ function generateBookmarklet()
 	baseuri = baseuri.replace(/[#?].*$/, "");
 	baseuri = baseuri.replace(/[^\/]*$/, "");
 	var code = "";
-	code += "document.body.appendChild(document.createElement('script')).src='" + baseuri + "shell.js';";
-	code += "document.body.appendChild(document.createElement('script')).appendChild(document." +
-			"createTextNode('NumShell.generateWindow(\\'" + baseuri + "\\');'));";
+	code += "var el = document.createElement('script');";
+	code += "el.setAttribute('src', '" + baseuri + "shell.js');";
+	code += "el.addEventListener('load', function(){" +
+			"NumShell.generateWindow('" + baseuri + "');}, false);";
+	code += "document.body.appendChild(el);";
 	document.write("<a href=\"javascript:(function(){" + code + "})();\">" +
 			"NumShell bookmarklet (drag and drop to bookmarks folder)</a>\n");
 }
 
 function generateWindow(baseuri)
 {
-	// Load NumJS, if needed
-	if (typeof(NumJS) == "undefined") {
-		document.body.appendChild(document.createElement('script')).src = baseuri + "../../NumJS.js";
-		document.body.appendChild(document.createElement('script')).
-				appendChild(document.createTextNode("NumJS.loader_html('" + baseuri + "../../');"));
-	}
-
 	if (document.getElementById("NumShell.prompt") && !document.getElementById("NumShell.win")) {
 		window.alert("NumShell is already integrated in this site!\n" +
 				"Use integrated NumShell instead of NumShell bookmarklet.");
 		return;
+	}
+
+	// Load NumJS, if needed
+	if (typeof(NumJS) == "undefined") {
+		var el = document.createElement('script');
+		el.setAttribute('src', baseuri + '../../NumJS.js');
+		el.addEventListener('load', function(){
+				NumJS.loader_html(baseuri + '../../'); NumShell.run(); }, false);
+		document.body.appendChild(el);
 	}
 
 	// Destroy pre-existing ui, if needed
@@ -302,8 +306,6 @@ function generateWindow(baseuri)
 	prompt.style.cssFloat = "right";
 	prompt.style.fontFamily = "Courier";
 	prompt.style.fontSize = "12px";
-
-	run();
 }
 
 var lastMouseDown = 0;
