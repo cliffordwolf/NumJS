@@ -75,3 +75,24 @@ NumJS.GenericMatrix.prototype.rank = function()
 	return this.rref().pivcols.length;
 };
 
+// invert generic matrices using rref()
+NumJS.GenericMatrix.prototype.op_inv = function(a)
+{
+	if (a.rows != a.cols)
+		throw "NumJS.RREF dimension mismatch";
+
+	var work = NumJS.MAT(a.rows, 2*a.rows);
+	work.paste(0, 0, a.rows, a.rows, a.cut(0, 0, a.rows, a.rows));
+	for (var i = 0; i < a.rows; i++)
+		work.set(i, a.rows+i, 1);
+
+	work = work.rref();
+
+	if (work.pivcols.length != a.rows)
+		return null;
+
+	var result = NumJS.MAT(a.rows, a.rows);
+	result.paste(0, 0, a.rows, a.rows, work.cut(0, a.rows, a.rows, a.rows));
+	return result;
+};
+
