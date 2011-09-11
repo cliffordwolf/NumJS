@@ -317,8 +317,6 @@ function run()
 	document.getElementById("NumShell.prompt").focus();
 }
 
-alert("NumShell loaded!");
-
 // Export from Namespace
 return {
 	handleKey: handleKey,
