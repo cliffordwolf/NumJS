@@ -21,6 +21,13 @@
 
 "use strict";
 
+NumJS.eps = (function(){
+	var i = 0;
+	while (1 + Math.pow(2, -i) != 1)
+		i++;
+	return Math.pow(2, -i/2);
+})();
+
 NumJS.ADD = function(a, b) {
 	if (typeof(a.op_add) == "function")
 		return a.op_add(a, b);

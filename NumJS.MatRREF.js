@@ -40,7 +40,7 @@ NumJS.GenericMatrix.prototype.rref = function()
 				i = k, i_abs = k_abs;
 		}
 
-		if (i_abs == 0)
+		if (i_abs < NumJS.eps)
 			continue;
 
 		var pivot = R.get(i, j);

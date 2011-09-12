@@ -48,7 +48,7 @@ NumJS.GenericMatrix.prototype.LU = function()
 	for (var k = 0; k < n; k++)
 	{
 		var pivot = U.get(k, k);
-		if (NumJS.ABS(pivot) == 0)
+		if (NumJS.ABS(pivot) < NumJS.eps)
 			return null;
 
 		L.set(k, k, 1);
@@ -114,7 +114,7 @@ NumJS.GenericMatrix.prototype.PLU = function()
 			P.pivot_row(pivot_i, k);
 		}
 
-		if (NumJS.ABS(pivot) == 0)
+		if (NumJS.ABS(pivot) < NumJS.eps)
 			return null;
 
 		L.set(k, k, 1);

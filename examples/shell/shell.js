@@ -56,6 +56,7 @@ function exec(code)
 		re: NumJS.RE,
 		im: NumJS.IM,
 		round: NumJS.ROUND,
+		EPS: NumJS.eps,
 		PI: Math.PI,
 		E: Math.E,
 	};
@@ -97,7 +98,7 @@ function exec(code)
 		text += "     clear ....................... clear screen\n\n";
 		text += "     Builtin functions: dot pow inv abs norm arg conj\n";
 		text += "                        transp exp log det re im round\n\n";
-		text += "     Builtin constants: PI E\n\n";
+		text += "     Builtin constants: EPS PI E\n\n";
 		text += "     Operators: ( ) * / \\ + -";
 		return text;
 	}
