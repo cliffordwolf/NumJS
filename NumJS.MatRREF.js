@@ -88,7 +88,7 @@ NumJS.GenericMatrix.prototype.op_inv = function(a)
 
 	work = work.rref();
 
-	if (work.pivcols.length != a.rows)
+	if (work.pivcols[a.rows-1] != a.rows-1)
 		return null;
 
 	var result = NumJS.MAT(a.rows, a.rows);
