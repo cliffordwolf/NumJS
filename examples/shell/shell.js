@@ -9,6 +9,7 @@ var hist = new Array();
 var hidx = 0;
 
 var env = new Object();
+var eqs = new Array();
 
 var welcomeMsg = "Type `example' to execute an example session or `help' for command overview.";
 
@@ -37,6 +38,229 @@ function val2str(value)
 	if (typeof(value.toString) == "function")
 		return value.toString();
 	return value;
+}
+
+function solve(varlist)
+{
+	var freeVars = new Array();
+	for (var i in varlist)
+	{
+		var v = env[varlist[i]];
+		if (typeof(v) == "number") {
+			var hdl = new (function(n){
+				this.get = function() { return env[n]; };
+				this.set = function(v) { env[n] = v; };
+			})(varlist[i]);
+			freeVars.push(hdl);
+		} else
+		if (typeof(v) == "object" && v instanceof NumJS.Cmplx) {
+			var hdl_re = new (function(n){
+				this.get = function() { return env[n].re; };
+				this.set = function(v) { env[n] = NumJS.C(v, env[n].im); };
+			})(varlist[i]);
+			var hdl_im = new (function(n){
+				this.get = function() { return env[n].im; };
+				this.set = function(v) { env[n] = NumJS.C(env[n].re, v); };
+			})(varlist[i]);
+			freeVars.push(hdl_re);
+			freeVars.push(hdl_im);
+		} else
+		if (typeof(v) == "object" && v instanceof NumJS.GenericMatrix) {
+			for (var k = 0; k < v.rows; k++)
+			for (var l = 0; l < v.cols; l++) {
+				var cell = v.get(k, l);
+				if (typeof(cell) == "number") {
+					var hdl = new (function(n, k, l){
+						this.get = function() { return env[n].get(k, l); };
+						this.set = function(v) { env[n].set(k, l, v); };
+					})(varlist[i], k, l);
+					freeVars.push(hdl);
+				} else
+				if (typeof(cell) == "object" && cell instanceof NumJS.Cmplx) {
+					var hdl_re = new (function(n, k, l){
+						this.get = function() { return env[n].get(k, l).re; };
+						this.set = function(v) { env[n].set(k, l,
+								NumJS.C(v, env[n].get(k, l).im)); };
+					})(varlist[i], k, l);
+					var hdl_im = new (function(n, k, l){
+						this.get = function() { return env[n].get(k, l).im; };
+						this.set = function(v) { env[n].set(k, l,
+								NumJS.C(env[n].get(k, l).re, v)); };
+					})(varlist[i], k, l);
+					freeVars.push(hdl_re);
+					freeVars.push(hdl_im);
+				} else
+					throw "NumShell solver type error";
+			}
+		} else
+			throw "NumShell solver type error";
+	}
+	// consoleOut("Solver found " + freeVars.length + " free variables.\n");
+
+	var itercount = 0;
+	while (1)
+	{
+		var diffVals = new Array();
+
+		if (itercount >= 30) {
+			// consoleOut("Maximum number of iterations reached.\n");
+			return total_res;
+		}
+
+		// consoleOut("Solver iteration " + (++itercount) + ":\n");
+
+		for (var i in eqs) {
+			eqs[i].diff_v = eqs[i].diff_f();
+			var v = eqs[i].diff_v;
+			if (typeof(v) == "number") {
+				var hdl = new (function(n){
+					this.get = function() { return eqs[n].diff_v; };
+				})(i);
+				diffVals.push(hdl);
+			} else
+			if (typeof(v) == "object" && v instanceof NumJS.Cmplx) {
+				var hdl_re = new (function(n){
+					this.get = function() { return eqs[n].diff_v.re; };
+				})(i);
+				var hdl_im = new (function(n){
+					this.get = function() { return eqs[n].diff_v.re; };
+				})(i);
+				diffVals.push(hdl_re);
+				diffVals.push(hdl_im);
+			} else
+			if (typeof(v) == "object" && v instanceof NumJS.GenericMatrix) {
+				for (var k = 0; k < v.rows; k++)
+				for (var l = 0; l < v.cols; l++) {
+					var cell = v.get(k, l);
+					if (typeof(cell) == "number") {
+						var hdl = new (function(n, k, l){
+							this.get = function() { return eqs[n].diff_v.get(k, l); };
+						})(i, k, l);
+						diffVals.push(hdl);
+					} else
+					if (typeof(cell) == "object" && cell instanceof NumJS.Cmplx) {
+						var hdl_re = new (function(n, k, l){
+							this.get = function() { return eqs[n].diff_v.get(k, l).re; };
+						})(i, k, l);
+						var hdl_im = new (function(n, k, l){
+							this.get = function() { return env[n].diff_v.get(k, l).im; };
+						})(i, k, l);
+						diffVals.push(hdl_re);
+						diffVals.push(hdl_im);
+					} else
+						throw "NumShell solver type error";
+				}
+			} else
+				throw "NumShell solver type error";
+		}
+
+		var J_low = NumJS.MAT(diffVals.length, freeVars.length);
+		var J_high = NumJS.MAT(diffVals.length, freeVars.length);
+		var res = NumJS.MAT(diffVals.length, 1);
+
+		var total_res = 0;
+		for (var i in diffVals)
+		{
+			var r = diffVals[i].get();
+			total_res += Math.abs(r);
+			res.set(i, 0, r);
+		}
+
+		// consoleOut("  minimizing " + diffVals.length + " differences (current total: " + total_res + ")\n");
+
+		var origVars = new Array();
+		for (var j in freeVars)
+		{
+			var v = freeVars[j].get();
+			origVars[j] = v;
+			freeVars[j].set(v - NumJS.eps);
+			for (var i in eqs)
+				eqs[i].diff_v = eqs[i].diff_f();
+			for (var i in diffVals) {
+				var r = diffVals[i].get();
+				J_low.set(i, j, r);
+			}
+			freeVars[j].set(v + NumJS.eps);
+			for (var i in eqs)
+				eqs[i].diff_v = eqs[i].diff_f();
+			for (var i in diffVals) {
+				var r = diffVals[i].get();
+				J_high.set(i, j, r);
+			}
+			freeVars[j].set(v);
+		}
+
+		var J = NumJS.DIV(NumJS.SUB(J_high, J_low), NumJS.eps);
+
+		// env["_SOLVE_R"] = res;
+		// env["_SOLVE_J"] = J;
+
+		// Solve it without much optimizations: (J'*J) s = J' res
+		var Jt = NumJS.TRANSP(J);
+		var s = NumJS.SOLVE(NumJS.MUL(Jt, J), NumJS.MUL(Jt, res));
+
+		// env["_SOLVE_S"] = s;
+
+		if (s == null)
+			throw "NumShell Solver: Jacoby singularity.";
+
+		var damping = 2;
+		var improv_res = total_res * 2;
+		while (improv_res > total_res + NumJS.eps)
+		{
+			damping = damping / 2;
+	
+			if (damping < 1e-3)
+				throw "NumShell Solver: Damping singularity.";
+
+			for (var j in freeVars) {
+				var v = freeVars[j].get();
+				origVars[j] = v;
+				freeVars[j].set(origVars[j] - s.get(j, 0) * damping);
+			}
+
+			var improv_res = 0;
+			for (var i in eqs)
+				eqs[i].diff_v = eqs[i].diff_f();
+			for (var i in diffVals)
+				improv_res += Math.abs(diffVals[i].get());
+		}
+
+		// consoleOut("  applied delta with damping " + damping + ", improved diff by " +
+		//		(total_res - improv_res) + "\n");
+
+		if (total_res - improv_res < NumJS.eps)
+			return improv_res;
+
+		total_res = improv_res;
+	}
+}
+
+function example(n)
+{
+	consoleOut("\n");
+	if (n == 1) {
+		handleExec("prec 2");
+		handleExec("A: [ 1, 2, 3; 4i, 5, 6i; -7, 9+9i, 0 ]");
+		handleExec("y: [ 10; 20; 30 ]");
+		handleExec("x: A \\ y");
+		handleExec("A * x");
+	} else
+	if (n == 2) {
+		handleExec("A: [-1; 0.5]");
+		handleExec("B: [+1; 0.2]");
+		handleExec("X: [0; 0]");
+		handleExec("norm(A-X) = 1.5");
+		handleExec("norm(B-X) = 1.5");
+		handleExec("solve X");
+		handleExec("show X");
+	} else {
+		var text = "";
+		text += "     example 1 ..... solving a complex linear system\n";
+		text += "     example 2 ..... finding the intersection of two circles";
+		return text;
+	}
+	return "END OF EXAMPLE";
 }
 
 function exec(code)
@@ -72,14 +296,12 @@ function exec(code)
 		return NumJS.Parse(RegExp.$1);
 	}
 
+	if (code.search(/^example *([0-9]+) *$/) == 0) {
+		return example(+RegExp.$1);
+	}
+
 	if (code.search(/^example *$/) == 0) {
-		consoleOut("\n");
-		handleExec("prec 2");
-		handleExec("A: [ 1, 2, 3; 4i, 5, 6i; -7, 9+9i, 0 ]");
-		handleExec("y: [ 10; 20; 30 ]");
-		handleExec("x: A \\ y");
-		handleExec("A * x");
-		return "END OF EXAMPLE";
+		return example(-1);
 	}
 
 	if (code.search(/^help *$/) == 0) {
@@ -87,12 +309,15 @@ function exec(code)
 		text += "     example ..................... execute example session\n";
 		text += "     help ........................ this help message\n";
 		text += "     list ........................ list variables and functions\n";
-		text += "     expr   ...................... execute expression\n";
-		text += "     var: expr   ................. define variable\n";
-		text += "     func(args): expr   .......... define function\n";
-		text += "     debug expr   ................ show javascript for expression\n";
-		text += "     show expr   ................. display matrix in 2d format\n";
-		text += "     prec N   .................... set display precision to N decimals\n";
+		text += "     delete { var | eq-nr } ...... delete var/func or equation\n";
+		text += "     expr ........................ execute expression\n";
+		text += "     expr = expr ................. create equation\n";
+		text += "     var: expr ................... define variable\n";
+		text += "     func(args): expr ............ define function\n";
+		text += "     solve var1 [var2 [...]] ..... solve equations for variables\n";
+		text += "     debug expr .................. show javascript for expression\n";
+		text += "     show expr ................... display matrix in 2d format\n";
+		text += "     prec N ...................... set display precision to N decimals\n";
 		if (document.getElementById("NumShell.win"))
 			text += "     close ....................... close NumShell window\n";
 		text += "     clear ....................... clear screen\n\n";
@@ -105,11 +330,14 @@ function exec(code)
 
 	if (code.search(/^list *$/) == 0) {
 		var text = "";
-		for (i in env) {
+		for (var i in env) {
 			text += "  " + i;
 		}
 		if (text == "")
 			text = "*empty*";
+		for (var i = 0; i < eqs.length; i++)
+			text += (i ? "\n" : "\n\n") + "  Eq " + i + ": " +
+					eqs[i].lhs + " = " + eqs[i].rhs;
 		return text;
 	}
 
@@ -139,6 +367,18 @@ function exec(code)
 		return val2str(value);
 	}
 
+	if (code.search(/^delete *([A-Za-z][A-Za-z_0-9]*)/) == 0) {
+		var name = RegExp.$1;
+		delete env[name];
+		return "done.";
+	}
+
+	if (code.search(/^delete *([0-9]+)/) == 0) {
+		var idx = +RegExp.$1;
+		eqs.splice(idx, 1);
+		return "done.";
+	}
+
 	if (code.search(/^([A-Za-z][A-Za-z_0-9]*) *\(([^()]*)\):(.*)/) == 0) {
 		var msg = RegExp.$1 + "(" + RegExp.$2 + ")";
 		var name = RegExp.$1;
@@ -147,7 +387,7 @@ function exec(code)
 		return msg.replace(/ /g, "");
 	}
 
-	if (code.search(/^show (.*)/) == 0) {
+	if (code.search(/^show *(.*)/) == 0) {
 		var value = (myEval(NumJS.Parse(RegExp.$1)))();
 		if (typeof(value) == "object" && "rows" in value && "cols" in value) {
 			var text = "";
@@ -172,6 +412,24 @@ function exec(code)
 			return text;
 		}
 		return val2str(value);
+	}
+
+	if (code.search(/(.*)=(.*)/) >= 0) {
+		var eq = { lhs: RegExp.$1, rhs: RegExp.$2 };
+		eq.lhs = eq.lhs.replace(/[ \t\r\n]/g, "");
+		eq.rhs = eq.rhs.replace(/[ \t\r\n]/g, "");
+		eq.lhs_f = myEval(NumJS.Parse(eq.lhs));
+		eq.rhs_f = myEval(NumJS.Parse(eq.rhs));
+		eq.diff_f = function() { return NumJS.SUB(this.lhs_f(), this.rhs_f()); };
+		var msg = "  Eq " + eqs.length + ": " + eq.lhs + " = " + eq.rhs;
+		eqs.push(eq);
+		return msg;
+	}
+
+	if (code.search(/^solve *(.*)/) == 0) {
+		var varlist = RegExp.$1;
+		varlist = varlist.split(/ +/);
+		return solve(varlist);
 	}
 
 	var value = (myEval(NumJS.Parse(code)))();

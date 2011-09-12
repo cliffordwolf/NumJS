@@ -45,6 +45,7 @@ NumJS.GenericMatrix.prototype =
 		return this.copy();
 	},
 	cut: function(i, j, rows, cols) {
+		i = +i, j = +j, rows = +rows, cols = +cols;
 		var result = new Array();
 		for (var y=0; y < rows; y++)
 		for (var x=0; x < cols; x++)
@@ -52,6 +53,7 @@ NumJS.GenericMatrix.prototype =
 		return result;
 	},
 	cut_cm: function(i, j, rows, cols) {
+		i = +i, j = +j, rows = +rows, cols = +cols;
 		var result = new Array();
 		for (var x=0; x < cols; x++)
 		for (var y=0; y < rows; y++)
@@ -59,11 +61,13 @@ NumJS.GenericMatrix.prototype =
 		return result;
 	},
 	paste: function(i, j, rows, cols, data) {
+		i = +i, j = +j, rows = +rows, cols = +cols;
 		for (var y=0; y < rows; y++)
 		for (var x=0; x < cols; x++)
 			this.set(i+y, j+x, data.shift());
 	},
 	paste_cm: function(i, j, rows, cols, data) {
+		i = +i, j = +j, rows = +rows, cols = +cols;
 		for (var x=0; x < cols; x++)
 		for (var y=0; y < rows; y++)
 			this.set(i+y, j+x, data.shift());
@@ -277,7 +281,7 @@ NumJS.GenericMatrix.prototype =
 		var result = new NumJS.Matrix(a.rows, a.cols);
 		for (var i=0; i < a.rows; i++)
 		for (var j=0; j < a.cols; j++)
-			result.set(i, j, NumJS.ROUND(a.get(j, i), n));
+			result.set(i, j, NumJS.ROUND(a.get(j, i), +n));
 		return result;
 	},
 	op_eq: function(a, b) {
@@ -302,12 +306,12 @@ NumJS.GenericMatrix.prototype =
 				throw "NumJS.Matrix dimension mismatch";
 			for (var i=0; i < a.rows; i++)
 			for (var j=0; j < b.cols; j++)
-				if (!NumJS.EQ_ABS(a.get(i, j), b.get(i, j), d))
+				if (!NumJS.EQ_ABS(a.get(i, j), b.get(i, j), +d))
 					return false;
 			return true;
 		}
 		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_eq_abs) == "function"))
-			return b.op_eq_abs(a, b);
+			return b.op_eq_abs(a, b, +d);
 		throw "NumJS.Matrix type error";
 	},
 	op_eq_rel: function(a, b, d) {
@@ -317,12 +321,12 @@ NumJS.GenericMatrix.prototype =
 				throw "NumJS.Matrix dimension mismatch";
 			for (var i=0; i < a.rows; i++)
 			for (var j=0; j < b.cols; j++)
-				if (!NumJS.EQ_REL(a.get(i, j), b.get(i, j), d))
+				if (!NumJS.EQ_REL(a.get(i, j), b.get(i, j), +d))
 					return false;
 			return true;
 		}
 		if (!(b instanceof NumJS.GenericMatrix) && (typeof(b.op_eq_rel) == "function"))
-			return b.op_eq_rel(a, b);
+			return b.op_eq_rel(a, b, +d);
 		throw "NumJS.Matrix type error";
 	},
 	toStringWorker: function(f) {
@@ -357,6 +361,7 @@ NumJS.GenericMatrix.prototype =
 // Just a normal Matrix
 
 NumJS.Matrix = function(rows, cols, initdata) {
+	rows = +rows, cols = +cols;
 	this.rows = rows;
 	this.cols = cols;
 	this.data = Array();
@@ -379,11 +384,13 @@ NumJS.MAT = function(rows, cols, initdata) {
 NumJS.Matrix.prototype = new NumJS.GenericMatrix();
 
 NumJS.Matrix.prototype.get = function(i, j) {
+	i = +i, j = +j;
 	var idx = i*this.cols + j;
 	return this.data[idx];
 };
 
 NumJS.Matrix.prototype.set = function(i, j, v) {
+	i = +i, j = +j;
 	var idx = i*this.cols + j;
 	this.data[idx] = v;
 	this.cache = new Object();
@@ -392,6 +399,7 @@ NumJS.Matrix.prototype.set = function(i, j, v) {
 // Permutation Matrix
 
 NumJS.PMatrix = function(dim, initdata) {
+	dim = +dim;
 	this.sign = 1;
 	this.rows = dim;
 	this.cols = dim;
@@ -442,6 +450,7 @@ NumJS.PMAT = function(dim, initdata) {
 NumJS.PMatrix.prototype = new NumJS.GenericMatrix();
 
 NumJS.PMatrix.prototype.get = function(i, j) {
+	i = +i, j = +j;
 	if (this.data[j] == i)
 		return 1;
 	return 0;
@@ -451,6 +460,7 @@ NumJS.PMatrix.prototype.get = function(i, j) {
 // therefore column pivoting is trivial and row pivoting must be performed indirectly
 
 NumJS.PMatrix.prototype.pivot_col = function(i, j) {
+	i = +i, j = +j;
 	if (i != j) {
 		var tmp = this.data[i];
 		this.data[i] = this.data[j];
@@ -461,6 +471,7 @@ NumJS.PMatrix.prototype.pivot_col = function(i, j) {
 };
 
 NumJS.PMatrix.prototype.pivot_row = function(i, j) {
+	i = +i, j = +j;
 	if (i != j) {
 		i = this.data.indexOf(i);
 		j = this.data.indexOf(j);
@@ -510,7 +521,7 @@ NumJS.PMatrix.prototype.op_det = function(a) {
 };
 
 NumJS.PMatrix.prototype.op_round = function(a, n) {
-	if (n >= 0)
+	if (+n >= 0)
 		return a.clone();
 	return NumJS.GenericMatrix.prototype.op_round(a, n);
 };
