@@ -95,19 +95,16 @@ function solve(varlist)
 		} else
 			throw "NumShell solver type error";
 	}
-	// consoleOut("Solver found " + freeVars.length + " free variables.\n");
 
 	var itercount = 0;
+	var total_res_sq = 0;
 	while (1)
 	{
 		var diffVals = new Array();
 
 		if (itercount >= 30) {
-			// consoleOut("Maximum number of iterations reached.\n");
-			return total_res;
+			return Math.sqrt(total_res_sq);
 		}
-
-		// consoleOut("Solver iteration " + (++itercount) + ":\n");
 
 		for (var i in eqs) {
 			eqs[i].diff_v = eqs[i].diff_f();
@@ -158,15 +155,13 @@ function solve(varlist)
 		var J_high = NumJS.MAT(diffVals.length, freeVars.length);
 		var res = NumJS.MAT(diffVals.length, 1);
 
-		var total_res = 0;
+		total_res_sq = 0;
 		for (var i in diffVals)
 		{
 			var r = diffVals[i].get();
-			total_res += Math.abs(r);
+			total_res_sq += r * r;
 			res.set(i, 0, r);
 		}
-
-		// consoleOut("  minimizing " + diffVals.length + " differences (current total: " + total_res + ")\n");
 
 		var origVars = new Array();
 		for (var j in freeVars)
@@ -192,21 +187,16 @@ function solve(varlist)
 
 		var J = NumJS.DIV(NumJS.SUB(J_high, J_low), NumJS.eps);
 
-		// env["_SOLVE_R"] = res;
-		// env["_SOLVE_J"] = J;
-
 		// Solve it without much optimizations: (J'*J) s = J' res
 		var Jt = NumJS.TRANSP(J);
 		var s = NumJS.SOLVE(NumJS.MUL(Jt, J), NumJS.MUL(Jt, res));
-
-		// env["_SOLVE_S"] = s;
 
 		if (s == null)
 			throw "NumShell Solver: Jacoby singularity.";
 
 		var damping = 2;
-		var improv_res = total_res * 2;
-		while (improv_res > total_res + NumJS.eps)
+		var improv_res_sq = total_res_sq * 2;
+		while (improv_res_sq > total_res_sq + NumJS.eps)
 		{
 			damping = damping / 2;
 	
@@ -219,20 +209,17 @@ function solve(varlist)
 				freeVars[j].set(origVars[j] - s.get(j, 0) * damping);
 			}
 
-			var improv_res = 0;
+			var improv_res_sq = 0;
 			for (var i in eqs)
 				eqs[i].diff_v = eqs[i].diff_f();
 			for (var i in diffVals)
-				improv_res += Math.abs(diffVals[i].get());
+				improv_res_sq += Math.pow(diffVals[i].get(), 2);
 		}
 
-		// consoleOut("  applied delta with damping " + damping + ", improved diff by " +
-		//		(total_res - improv_res) + "\n");
+		if (total_res_sq - improv_res_sq < NumJS.eps)
+			return Math.sqrt(improv_res_sq);
 
-		if (total_res - improv_res < NumJS.eps)
-			return improv_res;
-
-		total_res = improv_res;
+		total_res_sq = improv_res_sq;
 	}
 }
 
