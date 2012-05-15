@@ -27,7 +27,7 @@ This library provides:
         * numerical polynomial solver [TBD]
 
 The items marked as [TBD] aren't implemented yet. Feel free to implement
-them (and/or other stuff) and send my your pull requests.
+them (and/or other stuff) and send me your pull requests.
 
 
 A warning about numerical computing with JavaScript
@@ -220,10 +220,13 @@ The dimension of a matrix is stored in its .rows and .cols properties.
 A permutation matrix has an additional .sign property that holds the
 sign of the permutation.
 
-Matrices also have a .toString() method that is automatically used by
-the interpreter to convert a complex number to a string when needed. They
-also have .toFixed() and a .toPrecision() methods that are compatible with
-the generic JavaScript .toFixed() and .toPrecision() number methods.
+Matrices also have a .toString() method that is automatically used by the
+interpreter to convert a Matrix to a string when needed. They also have
+.toFixed() and a .toPrecision() methods that are compatible with the generic
+JavaScript .toFixed() and .toPrecision() number methods.
+
+Additionally matrices also have a .toTextBlock() method that creates
+a nice multi-line text representation of the matrix.
 
 
 Reduced row echelon form of a matrix and matrix rank

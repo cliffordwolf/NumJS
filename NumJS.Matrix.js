@@ -355,6 +355,27 @@ NumJS.GenericMatrix.prototype =
 		return this.toStringWorker(function(v){
 			return v.toPrecision(n);
 		});
+	},
+	toTextBlock: function() {
+		var str = "";
+		var max_len = 0;
+		for (var i=0; i < this.rows; i++) {
+			for (var j=0; j < this.cols; j++) {
+				var t = this.get(i, j).toString();
+				if (max_len < t.length)
+					max_len = t.length;
+			}
+		}
+		for (var i=0; i < this.rows; i++) {
+			for (var j=0; j < this.cols; j++) {
+				var t = this.get(i, j).toString();
+				while (t.length < max_len)
+					t = " " + t;
+				str += "  " + t;
+			}
+			str += "\n"
+		}
+		return str;
 	}
 };
 
