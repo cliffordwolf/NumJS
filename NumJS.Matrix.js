@@ -228,10 +228,7 @@ NumJS.GenericMatrix.prototype =
 			throw "NumJS.Matrix dimension mismatch";
 		for (var i=0; i < a.rows; i++)
 		for (var j=0; j < a.cols; j++) {
-			var v = a.get(j, i);
-			if (NumJS.IM(v) != 0)
-				throw "NumJS.Matrix type error";
-			v = NumJS.RE(v);
+			var v = NumJS.NORM(a.get(j, i));
 			norm2 += v*v;
 		}
 		return Math.sqrt(norm2);
