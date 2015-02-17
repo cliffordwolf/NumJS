@@ -1,8 +1,15 @@
 
+     Note: I am not actively maintaining this library anymore. (But I
+    will accept pull requests.) If you are considering this library you
+     should also consider writing your code in C/C++ and compile it to
+             JavaScript with Emscripten. That's what I do now.
+
+      - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * -
+
+
 NumJS -- A JavaScript library for numerical computing
 =====================================================
 
-       *** This library is work in progress ***
 
 This library provides:
 
@@ -20,7 +27,6 @@ This library provides:
     - special functions:
         * B-spline basis functions [TBD]
         * Gauss error function [TBD]
-        * Lambert W-functions [TBD]
 
     - polynomials:
         * evaluating polynomials [TBD]
@@ -33,7 +39,7 @@ them (and/or other stuff) and send me your pull requests.
 A warning about numerical computing with JavaScript
 ---------------------------------------------------
 
-Most JavaScript implementations store numbers as single precision (32bit)
+Some JavaScript implementations store numbers as single precision (32bit)
 floating point values. So the possible applications for JavaScript in the world
 of numerical computing is in fact very limited and you should always make sure
 that you understand how to estimate the numerical errors in the calculation you
@@ -95,7 +101,7 @@ Complex numbers can be created using the NumJS.C(re, im) helper function:
 
 or in polar coordinates using the NumJS.P(abs, arg) helper function:
 
-	var z = NumJS.C(Math.PI/4, Math.sqrt(2));
+	var z = NumJS.P(Math.PI/4, Math.sqrt(2));
 
 Complex numbers have a .toString() method that is automatically used by
 the interpreter to convert a complex number to a string when needed. They
